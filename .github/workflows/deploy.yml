@@ -1,0 +1,43 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER}@${HOST} << 'EOF'
+          cd /home/ubuntu/shami-2
+          git pull origin main
+          
+          # Backend deployment
+          cd shabnam-backend
+          npm install
+          npm run build
+          
+          # Frontend deployment
+          cd ../shabnam-overseas
+          npm install
+          npm run build
+          
+          # Restart PM2
+          pm2 restart all
+          
+          echo "Deployment completed successfully!"
+        EOF
