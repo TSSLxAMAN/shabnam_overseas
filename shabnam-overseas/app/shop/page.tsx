@@ -36,7 +36,7 @@ type Product = {
 
 export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [currency, setCurrency] = useState<Currency>("INR");
+  const [currency, setCurrency] = useState<Currency>("USD");
 
   // Multi-select filters
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -217,8 +217,25 @@ export default function ShopPage() {
     (priceMin ? 1 : 0) +
     (priceMax ? 1 : 0);
 
-  const SIZES = ["2x3", "3x5", "4x6", "5x8", "6x9"];
-  const COLORS = ["RED", "BLUE", "BEIGE", "GREEN", "GREY"];
+  const SIZES = useMemo(() => {
+    const sizeSet = new Set<string>();
+    products.forEach((product) => {
+      product.sizes?.forEach((size) => {
+        if (size.label) sizeSet.add(size.label);
+      });
+    });
+    return Array.from(sizeSet).sort();
+  }, [products]);
+
+  const COLORS = useMemo(() => {
+    const colorSet = new Set<string>();
+    products.forEach((product) => {
+      product.colors?.forEach((color) => {
+        if (color.label) colorSet.add(color.label);
+      });
+    });
+    return Array.from(colorSet).sort();
+  }, [products]);
 
   // Filter Component (reusable for both sidebar and modal)
   const FilterContent = () => (

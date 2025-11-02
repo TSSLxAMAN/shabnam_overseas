@@ -547,8 +547,8 @@ export default function ProductDetailPage() {
 
               {/* Product Details - 1/4 width */}
               <div className="lg:col-span-3 lg:sticky lg:top-[140px] self-start">
-                <div className="bg-[#f9f9f9] rounded-2xl p-5 sm:p-6">
-                  <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="bg-[#f9f9f9] rounded-2xl p-1 sm:p-6">
+                  <div className="flex items-start justify-between gap-4">
                     <h2 className="text-xl sm:text-2xl font-serif leading-tight">
                       {product.name}
                     </h2>
@@ -568,7 +568,14 @@ export default function ProductDetailPage() {
                       />
                     </button>
                   </div>
-
+                  <div className="flex mb-5 text-[#742402]">
+                    <span>
+                      <hr style={{ width: "180px", marginTop: "9px" }}></hr>
+                    </span>
+                    <span className="text-sm mx-2 text-[#742402]">
+                      Ships in 90 - 120 days
+                    </span>
+                  </div>
                   <div className="text-sm text-gray-600 font-serif leading-relaxed mb-5">
                     {product.description}
                   </div>
@@ -740,7 +747,7 @@ export default function ProductDetailPage() {
                       }
                     />
                     <AccordionItem
-                      title="Shipping & Returns"
+                      title="Shipping & Returns "
                       content={
                         product.shippingReturns ||
                         "Free shipping on orders over ₹10,000. 30-day return policy. Items must be in original condition. Contact customer service for return authorization."

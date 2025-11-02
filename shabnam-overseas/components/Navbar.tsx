@@ -3,8 +3,17 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import {
-  Calendar, Search, Heart, User, ShoppingCart, Menu, X,
-  ChevronDown, ChevronRight, ChevronUp, UserRoundCheck,
+  Calendar,
+  Search,
+  Heart,
+  User,
+  ShoppingCart,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  UserRoundCheck,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/UserAuthContext";
@@ -19,12 +28,16 @@ export default function Navbar({
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [mobileDropdowns, setMobileDropdowns] = useState<Record<string, boolean>>({});
+  const [mobileDropdowns, setMobileDropdowns] = useState<
+    Record<string, boolean>
+  >({});
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showSearch, setShowSearch] = useState(false); // NEW
+  const [showSearch, setShowSearch] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // NEW: navbar visibility
+  const [lastScrollY, setLastScrollY] = useState(0); // NEW: track last scroll position
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { user, admin, logout, adminLogout } = useAuth();
   const router = useRouter();
@@ -48,9 +61,40 @@ export default function Navbar({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [forceWhite, disableScrollEffect]);
 
+  // NEW: Auto-hide/show navbar on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Show navbar when:
+      // 1. At the top of the page (< 10px)
+      // 2. Scrolling up
+      if (currentScrollY < 10) {
+        setIsVisible(true);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and past 100px
+        setIsVisible(false);
+        // Close dropdowns when hiding
+        setActiveDropdown(null);
+        setShowSearch(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
         setShowUserMenu(false);
       }
     };
@@ -72,21 +116,61 @@ export default function Navbar({
 
   const dropdownContent = {
     Shop: [
-      { title: "BY TYPE", links: ["Hand-Knotted", "Hand-Tufted", "Hand Woven","Hand Loom", "Tibetan Weave"] },
-      { title: "BY ROOM", links: ["Living Room", "Bedroom", "Dining Room", "Hallway"] },
+      {
+        title: "BY TYPE",
+        links: [
+          "Hand-Knotted",
+          "Hand-Tufted",
+          "Hand Woven",
+          "Hand Loom",
+          "Tibetan Weave",
+        ],
+      },
+      {
+        title: "BY ROOM",
+        links: ["Living Room", "Bedroom", "Dining Room", "Hallway"],
+      },
       { title: "BY COLOR", links: ["Red", "Blue", "Beige", "Green", "Grey"] },
-      { title: "NEW ARRIVALS", links: ["Latest Rugs", "Trending Styles", "Bestsellers"] },
+      {
+        title: "NEW ARRIVALS",
+        links: ["Latest Rugs", "Trending Styles", "Bestsellers"],
+      },
     ],
-    Style: [{ title: "STYLES", links: ["Modern", "Traditional", "Bohemian", "Minimalist", "Vintage"] }],
+    Style: [
+      {
+        title: "STYLES",
+        links: ["Modern", "Traditional", "Bohemian", "Minimalist", "Vintage"],
+      },
+    ],
     Stories: [
       {
         title: "Stories",
         links: [
-          { text: "Designer Stories", image: "/images/hero1.jpg", desc: "Discover unique perspectives" },
-          { text: "Behind the Loom", image: "/images/hero1.jpg", desc: "See the weaving process" },
-          { text: "Styling Tips", image: "/images/hero1.jpg", desc: "Get inspired with expert ideas" },
-          { text: "Customer Stories", image: "/images/hero1.jpg", desc: "Real homes. Real style." },
-          { text: "Journal", image: "/images/hero1.jpg", desc: "Thoughts and news" },
+          {
+            text: "Designer Stories",
+            image: "/images/hero1.jpg",
+            desc: "Discover unique perspectives",
+          },
+          {
+            text: "Behind the Loom",
+            image: "/images/hero1.jpg",
+            desc: "See the weaving process",
+          },
+          {
+            text: "Styling Tips",
+            image: "/images/hero1.jpg",
+            desc: "Get inspired with expert ideas",
+          },
+          {
+            text: "Customer Stories",
+            image: "/images/hero1.jpg",
+            desc: "Real homes. Real style.",
+          },
+          {
+            text: "Journal",
+            image: "/images/hero1.jpg",
+            desc: "Thoughts and news",
+          },
         ],
       },
     ],
@@ -98,10 +182,16 @@ export default function Navbar({
   };
 
   const backgroundClass =
-    forceWhite || isScrolled || isHovered ? "bg-white text-black shadow-md" : "bg-transparent text-white";
+    forceWhite || isScrolled || isHovered
+      ? "bg-white text-black shadow-md"
+      : "bg-transparent text-white";
 
   /** Build /shop?... or /style?... based on parent label + section */
-  const buildFilterHref = (parentLabel: string, sectionTitle: string, label: string) => {
+  const buildFilterHref = (
+    parentLabel: string,
+    sectionTitle: string,
+    label: string
+  ) => {
     let key = "";
     switch (sectionTitle) {
       case "Styles":
@@ -123,7 +213,12 @@ export default function Navbar({
       default:
         key = "filter";
     }
-    const base = parentLabel === "Shop" ? "/shop/filter" : parentLabel === "Style" ? "/style" : "/style";
+    const base =
+      parentLabel === "Shop"
+        ? "/shop/filter"
+        : parentLabel === "Style"
+        ? "/style"
+        : "/style";
     return `${base}?${key}=${encodeURIComponent(label.toUpperCase())}`;
   };
 
@@ -140,12 +235,22 @@ export default function Navbar({
               {dropdownContent.Stories[0].links.map((item, i) => (
                 <Link
                   key={i}
-                  href={`/stories/${item.text.toLowerCase().replace(/\s+/g, "-")}`}
+                  href={`/stories/${item.text
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
                   className="hover:text-sand flex flex-col items-center"
                 >
-                  <img src={item.image} alt={item.text} className="w-28 h-28 object-cover rounded-md" />
-                  <h5 className="font-semibold text-sm mt-2 text-center">{item.text}</h5>
-                  <p className="text-xs text-gray-600 text-center">{item.desc}</p>
+                  <img
+                    src={item.image}
+                    alt={item.text}
+                    className="w-28 h-28 object-cover rounded-md"
+                  />
+                  <h5 className="font-semibold text-sm mt-2 text-center">
+                    {item.text}
+                  </h5>
+                  <p className="text-xs text-gray-600 text-center">
+                    {item.desc}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -153,12 +258,18 @@ export default function Navbar({
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {dropdownContent.Style.map((section, idx) => (
                 <div key={idx}>
-                  <h4 className="font-semibold text-sm mb-2">{section.title}</h4>
+                  <h4 className="font-semibold text-sm mb-2">
+                    {section.title}
+                  </h4>
                   <ul className="space-y-1 text-sm">
                     {section.links.map((linkLabel, i) => (
                       <li key={i}>
                         <Link
-                          href={buildFilterHref("Style", section.title, linkLabel)}
+                          href={buildFilterHref(
+                            "Style",
+                            section.title,
+                            linkLabel
+                          )}
                           className="hover:text-sand"
                         >
                           {linkLabel}
@@ -174,14 +285,21 @@ export default function Navbar({
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {dropdownContent.Shop.map((section, idx) => (
                 <div key={idx}>
-                  <h4 className="font-semibold text-sm mb-2">{section.title}</h4>
+                  <h4 className="font-semibold text-sm mb-2">
+                    {section.title}
+                  </h4>
                   <ul className="space-y-1 text-sm">
                     {section.links.map((lnk, i) => {
-                      const labelText = typeof lnk === "string" ? lnk : (lnk as any).text;
+                      const labelText =
+                        typeof lnk === "string" ? lnk : (lnk as any).text;
                       return (
                         <li key={i}>
                           <Link
-                            href={buildFilterHref("Shop", section.title, labelText)}
+                            href={buildFilterHref(
+                              "Shop",
+                              section.title,
+                              labelText
+                            )}
                             className="hover:text-sand"
                           >
                             {labelText}
@@ -203,7 +321,9 @@ export default function Navbar({
     <header
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${backgroundClass}`}
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${backgroundClass} ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
     >
       {/* Top bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4 flex justify-between items-center">
