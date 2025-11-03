@@ -148,7 +148,7 @@ function FilterContent() {
       const data = res.data?.products ?? [];
       setProducts(data);
     } catch (error: any) {
-      console.error("Failed to fetch products", error?.message || error);
+      // console.error("Failed to fetch products", error?.message || error);
       toast.error("Failed to load products.");
       setProducts([]);
     } finally {
@@ -184,7 +184,7 @@ function FilterContent() {
         return;
       }
     } catch (err) {
-      console.warn("Wishlist preload failed");
+      // console.warn("Wishlist preload failed");
     }
   };
 

@@ -109,7 +109,7 @@ export default function TraderPage() {
       }
       fetchDiscount()
     } catch (error) {
-      console.error("Network error:", error);
+      // console.error("Network error:", error);
       toast.error("Network error. Please try again.");
     } finally {
       setIsLoading(false);
@@ -135,8 +135,8 @@ export default function TraderPage() {
       const data = await response.json();
       setTraders(data);
     } catch (err) {
-      console.error(err);
-      console.error("Failed to fetch traders");
+      // console.error(err);
+      // console.error("Failed to fetch traders");
     } finally {
       setLoading(false);
     }
@@ -155,7 +155,7 @@ export default function TraderPage() {
       }
 
       const data = await response.json();
-      console.log(data)
+      // console.log(data)
       // Access the latest discount (assuming last item in array is latest)
       if (data?.data?.length > 0) {
         const latestDiscount = data.data[0];
@@ -163,8 +163,8 @@ export default function TraderPage() {
       }
 
     } catch (err) {
-      console.error(err);
-      console.error("Failed to fetch discounts");
+      // console.error(err);
+      // console.error("Failed to fetch discounts");
     }
   };
 
@@ -222,7 +222,7 @@ export default function TraderPage() {
         throw new Error("Failed to verify trader");
       }
 
-      console.log("Trader verified!");
+      // console.log("Trader verified!");
       setTraders((prev) =>
         prev.map((t) =>
           t._id === id
@@ -236,8 +236,8 @@ export default function TraderPage() {
         )
       );
     } catch (err) {
-      console.error(err);
-      console.error("Failed to verify trader");
+      // console.error(err);
+      // console.error("Failed to verify trader");
     } finally {
       markBusy(id, false);
     }
@@ -265,7 +265,7 @@ export default function TraderPage() {
         throw new Error("Failed to unverify trader");
       }
 
-      console.log("Trader blocked");
+      // console.log("Trader blocked");
       setTraders((prev) =>
         prev.map((t) =>
           t._id === id
@@ -279,8 +279,8 @@ export default function TraderPage() {
         )
       );
     } catch (err) {
-      console.error(err);
-      console.error("Error blocking trader");
+      // console.error(err);
+      // console.error("Error blocking trader");
     } finally {
       markBusy(id, false);
     }

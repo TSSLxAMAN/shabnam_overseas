@@ -74,7 +74,7 @@ export default function ShopPage() {
       try {
         data = JSON.parse(text);
       } catch {
-        console.error("Non-JSON response from /api/products:", text);
+        // console.error("Non-JSON response from /api/products:", text);
         data = [];
       }
 
@@ -82,7 +82,7 @@ export default function ShopPage() {
       else if (Array.isArray(data?.products)) setProducts(data.products);
       else setProducts([]);
     } catch (err) {
-      console.error("Failed to fetch products", err);
+      // console.error("Failed to fetch products", err);
       setProducts([]);
     }
   };

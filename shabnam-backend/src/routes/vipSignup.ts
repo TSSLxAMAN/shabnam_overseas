@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
 
     res.status(200).json({ message: "VIP signup successful!" });
   } catch (error) {
-    console.error("VIP signup email error:", error);
+    // console.error("VIP signup email error:", error);
     res.status(500).json({ message: "Failed to process VIP signup" });
   }
 });

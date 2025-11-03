@@ -118,7 +118,7 @@ export default function NewProductPage() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    console.log(files);
+    // console.log(files);
     setUploading(true);
     try {
       const uploadedUrls: string[] = [];

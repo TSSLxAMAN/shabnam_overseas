@@ -58,7 +58,7 @@ export default function ProfilePage() {
         const token = userInfo ? JSON.parse(userInfo).token : null;
 
         if (!token) {
-          console.error("No token found, user not logged in.");
+          // console.error("No token found, user not logged in.");
           return;
         }
 
@@ -74,7 +74,7 @@ export default function ProfilePage() {
           if (data.orders) setOrders(data.orders);
         }
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        // console.error("Error fetching profile:", error);
       } finally {
         setLoading(false);
       }
@@ -126,7 +126,7 @@ export default function ProfilePage() {
         });
       } catch (e) {
         // Silent; UI still works without fetched descriptions
-        console.warn("[profile] product enrichment failed", e);
+        // console.warn("[profile] product enrichment failed", e);
       }
     })();
   }, [orders, productInfoMap]);
@@ -141,7 +141,7 @@ export default function ProfilePage() {
       const userInfo = localStorage.getItem("userInfo");
       const token = userInfo ? JSON.parse(userInfo).token : null;
       if (!token) {
-        console.error("No token found, user not logged in.");
+        // console.error("No token found, user not logged in.");
         return;
       }
       await axios.put(`https://www.shabnamoverseas.com/api/users/profile`, user, {
@@ -149,7 +149,7 @@ export default function ProfilePage() {
       });
       alert("Profile updated successfully!");
     } catch (error) {
-      console.error("Error updating profile:", error);
+      // console.error("Error updating profile:", error);
     }
   };
 

@@ -55,7 +55,7 @@ export const createOrder = async (req: Request, res: Response) => {
       key: process.env.RAZORPAY_KEY_ID,
     });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ success: false, message: "Order creation failed" });
   }
 };
@@ -92,7 +92,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
       res.status(400).json({ success: false, message: "Invalid signature" });
     }
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res
       .status(500)
       .json({ success: false, message: "Payment verification failed" });

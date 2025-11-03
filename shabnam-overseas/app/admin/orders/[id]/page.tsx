@@ -73,7 +73,7 @@ export default function AdminOrderDetailsPage() {
 
         setOrder(data);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         toast.error("Failed to load order details");
       } finally {
         setLoading(false);

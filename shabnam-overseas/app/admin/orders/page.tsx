@@ -37,7 +37,7 @@ export default function AdminOrdersPage() {
 
         setOrders(data);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         toast.error("Failed to load orders");
       } finally {
         setLoading(false);
@@ -56,7 +56,7 @@ export default function AdminOrdersPage() {
       }
       const { token } = JSON.parse(storedAdmin);
 
-      console.log("Delivering order:", id); // 👀 log
+      // console.log("Delivering order:", id); // 👀 log
 
       const { data } = await axios.put(
         `https://www.shabnamoverseas.com/api/admin/orders/${id}/deliver`,
@@ -64,7 +64,7 @@ export default function AdminOrdersPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("Backend response:", data); // 👀 log
+      // console.log("Backend response:", data); // 👀 log
 
       toast.success("Order marked as delivered");
 
@@ -74,7 +74,7 @@ export default function AdminOrdersPage() {
         )
       );
     } catch (err: any) {
-      console.error("Deliver error:", err.response?.data || err.message);
+      // console.error("Deliver error:", err.response?.data || err.message);
       toast.error("Failed to mark as delivered");
     }
   };

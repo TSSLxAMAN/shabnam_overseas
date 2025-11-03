@@ -357,8 +357,8 @@ export const getFilteredProducts = asyncHandler(
       style,
     } = req.query;
 
-    console.log("📩 Incoming /products request");
-    console.log("👉 Raw query params:", req.query);
+    // console.log("📩 Incoming /products request");
+    // console.log("👉 Raw query params:", req.query);
 
     const query: any = {};
 
@@ -385,7 +385,7 @@ export const getFilteredProducts = asyncHandler(
     if (byRoom) query.byRoom = byRoom.toUpperCase();
     if (style) query.style = style.toUpperCase();
 
-    console.log("MongoDB query:", JSON.stringify(query, null, 2));
+    // console.log("MongoDB query:", JSON.stringify(query, null, 2));
 
     const pageNum = Math.max(1, parseInt(page, 10));
     const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10)));
@@ -458,9 +458,9 @@ export const getFilteredProducts = asyncHandler(
         totalCount = count;
       }
 
-      console.log(
-        `Found ${products.length} products out of ${totalCount} total`
-      );
+      // console.log(
+      //   `Found ${products.length} products out of ${totalCount} total`
+      // );
 
       const totalPages = limitNum < 9999 ? Math.ceil(totalCount / limitNum) : 1;
       const hasNextPage = pageNum < totalPages;
@@ -483,7 +483,7 @@ export const getFilteredProducts = asyncHandler(
 
       res.json(response);
     } catch (error) {
-      console.error("Error fetching filtered products:", error);
+      // console.error("Error fetching filtered products:", error);
       res.status(500).json({
         message: "Error fetching products",
         error: process.env.NODE_ENV === "development" ? error : {},
@@ -508,7 +508,7 @@ export const getFilterOptions = asyncHandler(
         colors: colors.filter(Boolean),
       });
     } catch (error) {
-      console.error("Error fetching filter options:", error);
+      // console.error("Error fetching filter options:", error);
       res.status(500).json({
         message: "Error fetching filter options",
         error: process.env.NODE_ENV === "development" ? error : {},
@@ -528,7 +528,7 @@ export const getProductById = asyncHandler(
       }
       res.json(product);
     } catch (error) {
-      console.error("Error fetching product:", error);
+      // console.error("Error fetching product:", error);
       res.status(500).json({ message: "Server error" });
     }
   }

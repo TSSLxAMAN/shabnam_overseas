@@ -55,7 +55,7 @@ export default function OrdersPage() {
           setOrders(data.orders.filter((o: Order) => o.isPaid));
         }
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         toast.error("Failed to load orders");
       } finally {
         setLoading(false);

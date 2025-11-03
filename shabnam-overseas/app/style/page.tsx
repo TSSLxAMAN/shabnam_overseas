@@ -95,7 +95,7 @@ function StylePageContent() {
       const data = res.data?.products ?? [];
       setProducts(data);
     } catch (error: any) {
-      console.error("Failed to fetch products", error?.message || error);
+      // console.error("Failed to fetch products", error?.message || error);
       toast.error("Failed to load products.");
       setProducts([]);
     } finally {
@@ -131,7 +131,7 @@ function StylePageContent() {
       const ids3 = normalizeWishlistIds(r3.data);
       setWishlist(new Set(ids3));
     } catch (err) {
-      console.warn("Wishlist preload failed (non-fatal).");
+      // console.warn("Wishlist preload failed (non-fatal).");
     }
   };
 

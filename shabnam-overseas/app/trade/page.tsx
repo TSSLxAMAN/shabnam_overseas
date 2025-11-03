@@ -51,7 +51,7 @@ export default function TradePage() {
         toast.error(data.message || "Something went wrong");
       }
     } catch (error) {
-      console.error("Error submitting trade form:", error);
+      // console.error("Error submitting trade form:", error);
       alert("Server error. Please try again later.");
     }
   };

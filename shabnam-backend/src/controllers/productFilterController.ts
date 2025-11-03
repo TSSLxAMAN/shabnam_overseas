@@ -105,7 +105,7 @@ export const filterProducts = async (
       products,
     });
   } catch (error) {
-    console.error("Filter products error:", error);
+    // console.error("Filter products error:", error);
     res.status(500).json({
       success: false,
       message: "Server error while filtering products",
@@ -151,7 +151,7 @@ export const getFilterOptions = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Get filter options error:", error);
+    // console.error("Get filter options error:", error);
     res.status(500).json({
       success: false,
       message: "Server error while fetching filter options",
@@ -217,7 +217,7 @@ export const advancedFilterProducts = async (
       products,
     });
   } catch (error) {
-    console.error("Advanced filter products error:", error);
+    // console.error("Advanced filter products error:", error);
     res.status(500).json({
       success: false,
       message: "Server error while filtering products",

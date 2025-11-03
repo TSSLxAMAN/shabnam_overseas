@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ] = `Bearer ${adminParsed.token}`;
         return; // If admin is logged in, don't check for user
       } catch (error) {
-        console.error("Error parsing admin data:", error);
+        // console.error("Error parsing admin data:", error);
         localStorage.removeItem("adminInfo");
       }
     }
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           "Authorization"
         ] = `Bearer ${userParsed.token}`;
       } catch (error) {
-        console.error("Error parsing user data:", error);
+        // console.error("Error parsing user data:", error);
         localStorage.removeItem("userInfo");
       }
     }

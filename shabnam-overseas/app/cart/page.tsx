@@ -95,7 +95,7 @@ export default function CartPage() {
 
   // Helper function to get item price
   const getItemPrice = (item: CartItem): number => {
-    console.log(item)
+    // console.log(item)
     // Fallback to first size price if no specific size
     if (item.price) {
       return item.price;
@@ -142,23 +142,23 @@ export default function CartPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
-        console.log("Cart API Response:", data); // Debug log
+        // console.log("Cart API Response:", data); // Debug log
 
         const items = Array.isArray(data) ? data : data?.items || [];
-        console.log(items)
+        // console.log(items)
         // Filter out items with null products and ensure proper structure
         const validItems = items.filter((item: CartItem) => {
           if (!item.product) {
-            console.log("Filtering out item with null product:", item._id);
+            // console.log("Filtering out item with null product:", item._id);
             return false;
           }
           return true;
         });
 
-        console.log("Valid cart items:", validItems); // Debug log
+        // console.log("Valid cart items:", validItems); // Debug log
         setCart(validItems);
       } catch (err) {
-        console.error("Error fetching cart", err);
+        // console.error("Error fetching cart", err);
         setCart([]);
       } finally {
         setLoading(false);
@@ -183,7 +183,7 @@ export default function CartPage() {
         headers: { Authorization: `Bearer ${user.token}` },
       });
     } catch (err: any) {
-      console.error("Error removing from cart:", err?.response?.data || err);
+      // console.error("Error removing from cart:", err?.response?.data || err);
       // Revert on error
       try {
         const { data } = await axios.get(CART_ENDPOINT, {
@@ -227,7 +227,7 @@ export default function CartPage() {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
     } catch (err: any) {
-      console.error("Update qty failed:", err?.response?.data || err);
+      // console.error("Update qty failed:", err?.response?.data || err);
       setCart(prev);
     } finally {
       setUpdatingId(null);
@@ -352,7 +352,7 @@ export default function CartPage() {
                   const img = item.product.image?.[0];
                   const qty = item.quantity || 0;
                   const unit = getItemPrice(item);
-                  console.log(unit)
+                  // console.log(unit)
                   const line = unit * qty;
                   const availableStock = getAvailableStock(item);
                   const selectedSize = getSelectedSize(item);

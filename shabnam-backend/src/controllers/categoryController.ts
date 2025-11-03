@@ -7,7 +7,7 @@ export const getCategories = async (req: Request, res: Response) => {
     const categories = await Category.find().sort({ type: 1, name: 1 });
     res.json(categories);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: "Failed to fetch categories" });
   }
 };
@@ -28,7 +28,7 @@ export const createCategory = async (req: Request, res: Response) => {
     const newCategory = await Category.create({ name: name.trim(), type });
     res.status(201).json(newCategory);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: "Failed to create category" });
   }
 };
@@ -43,7 +43,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
     await category.deleteOne();
     res.json({ message: "Deleted successfully" });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: "Failed to delete category" });
   }
 };

@@ -32,7 +32,7 @@ export const protect = asyncHandler(
 
         return next();
       } catch (error) {
-        console.error(error);
+        // console.error(error);
         res.status(401);
         throw new Error("Not authorized, token failed");
       }
@@ -69,7 +69,7 @@ export const protectAdmin = async (
       req.admin = admin;
       next();
     } catch (error) {
-      console.error("JWT verification error:", error);
+      // console.error("JWT verification error:", error);
       res.status(401).json({ message: "Not authorized, token failed" });
     }
   } else {

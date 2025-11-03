@@ -50,7 +50,7 @@ export const createDiscount = async (
       data: newDiscount,
     });
   } catch (error) {
-    console.error("Error saving discount:", error);
+    // console.error("Error saving discount:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -70,7 +70,7 @@ export const getDiscounts = async (
       data: discounts,
     });
   } catch (error) {
-    console.error("Error fetching discounts:", error);
+    // console.error("Error fetching discounts:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

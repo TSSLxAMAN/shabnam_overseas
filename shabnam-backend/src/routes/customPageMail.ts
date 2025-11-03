@@ -58,7 +58,7 @@ router.post("/", upload.array("images", 5), async (req, res) => {
 
     res.status(200).json({ message: "Submission successful and email sent!" });
   } catch (error) {
-    console.error("Email sending error:", error);
+    // console.error("Email sending error:", error);
     res.status(500).json({ message: "Failed to send custom page email" });
   }
 });

@@ -58,10 +58,10 @@ export default function TraderDetailsPage() {
         `https://www.shabnamoverseas.com/api/admin/traders/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(data);
+      // console.log(data);
       setTrader(data);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error("Failed to fetch trader details");
     } finally {
       setLoading(false);

@@ -94,7 +94,7 @@ const ProductCard = ({
           const discountValue = res.data?.data?.[0]?.value || 0;
           setDiscount(discountValue);
         } catch (err) {
-          console.error("Error fetching discount:", err);
+          // console.error("Error fetching discount:", err);
           setDiscount(0);
         }
       })();
@@ -112,7 +112,7 @@ const ProductCard = ({
         const wishlistIds = data.map((item: any) => item._id || item);
         setWishlistedIds(new Set(wishlistIds));
       } catch (error) {
-        console.error("Error fetching wishlist:", error);
+        // console.error("Error fetching wishlist:", error);
       }
     };
     fetchWishlist();
@@ -288,7 +288,7 @@ export default function ProductDetailPage() {
           const discountValue = res.data?.data?.[0]?.value || 0;
           setDiscount(discountValue);
         } catch (err) {
-          console.error("Error fetching discount:", err);
+          // console.error("Error fetching discount:", err);
           setDiscount(0);
         }
       })();
@@ -315,7 +315,7 @@ export default function ProductDetailPage() {
         }
         setQuantity(1);
       } catch (err) {
-        console.error("Error fetching product:", err);
+        // console.error("Error fetching product:", err);
         setProduct(null);
       } finally {
         setLoading(false);
@@ -336,7 +336,7 @@ export default function ProductDetailPage() {
         const shuffled = filteredProducts.sort(() => 0.5 - Math.random());
         setRelatedProducts(shuffled.slice(0, 4));
       } catch (err) {
-        console.error("Error fetching related products:", err);
+        // console.error("Error fetching related products:", err);
         setRelatedProducts([]);
       } finally {
         setRelatedLoading(false);
@@ -359,7 +359,7 @@ export default function ProductDetailPage() {
         const wishlistIds = data.map((item: any) => item._id || item);
         setWishlistedIds(new Set(wishlistIds));
       } catch (error) {
-        console.error("Error fetching wishlist:", error);
+        // console.error("Error fetching wishlist:", error);
       }
     };
     fetchWishlist();

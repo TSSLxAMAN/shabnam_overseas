@@ -34,7 +34,7 @@ interface UpdateAdminRequest extends Request {
 // 🟩 Admin Login (with debug logs)
 export const loginAdmin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  console.log(req.body)
+  // console.log(req.body)
   const admin = await Admin.findOne({ email });
 
   if (!admin) {
@@ -139,7 +139,7 @@ export const getAllAdmins = async (req: Request, res: Response) => {
     const admins = await Admin.find().select('-password') // Hide passwords
     res.json(admins)
   } catch (err) {
-    console.error(err)
+    // console.error(err)
     res.status(500).json({ message: 'Failed to fetch admins' })
   }
 }

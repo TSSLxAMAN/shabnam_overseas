@@ -116,7 +116,7 @@ export default function WishlistPage() {
           broadcastWishlistCount(items.length);
         }
       } catch (err) {
-        console.error("Error fetching wishlist", err);
+        // console.error("Error fetching wishlist", err);
       } finally {
         if (!unsub) setLoading(false);
       }

@@ -59,7 +59,7 @@ export default function AdminCategoryPage() {
       const { data } = await axiosInstance.get("/categories");
       setCategories(data);
     } catch (error) {
-      console.error("Failed to fetch categories:", error);
+      // console.error("Failed to fetch categories:", error);
       toast.error("Failed to load categories");
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ export default function AdminCategoryPage() {
       setNewValue("");
       toast.success(`${activeTab} added successfully`);
     } catch (error: any) {
-      console.error("Failed to add category:", error);
+      // console.error("Failed to add category:", error);
       toast.error(error.response?.data?.message || "Failed to add category");
     } finally {
       setIsAdding(false);
@@ -99,7 +99,7 @@ export default function AdminCategoryPage() {
       setCategories(categories.filter((cat) => cat._id !== id));
       toast.success("Deleted successfully");
     } catch (error: any) {
-      console.error("Failed to delete category:", error);
+      // console.error("Failed to delete category:", error);
       toast.error(error.response?.data?.message || "Failed to delete");
     }
   };

@@ -86,7 +86,7 @@ export default function EditProductPage() {
         });
       } catch (err: any) {
         toast.error("Failed to load product");
-        console.error(err);
+        // console.error(err);
         router.push("/admin/products");
       } finally {
         setLoading(false);
@@ -190,7 +190,7 @@ export default function EditProductPage() {
       }
     } catch (err) {
       toast.error("Upload failed");
-      console.error(err);
+      // console.error(err);
     } finally {
       setUploading(false);
     }
@@ -256,7 +256,7 @@ export default function EditProductPage() {
       router.push("/admin/products");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Update failed");
-      console.error(err);
+      // console.error(err);
     }
   };
 

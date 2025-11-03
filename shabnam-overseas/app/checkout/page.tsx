@@ -87,10 +87,10 @@ export default function CheckoutPage() {
       }
 
       const data = await res.json();
-      console.log(data)
+      // console.log(data)
       const items: CartItem[] = Array.isArray(data) ? data : [];
       setCartItems(items);
-      console.log(cartItems)
+      // console.log(cartItems)
       // ✅ Calculate grand total using correct size price
       const total = items.reduce((acc, item) => {
         const selectedSize = item.price
@@ -100,7 +100,7 @@ export default function CheckoutPage() {
 
       setItemsPrice(total);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error("Unable to load cart");
     } finally {
       setLoading(false);
@@ -227,7 +227,7 @@ export default function CheckoutPage() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       toast.error("Something went wrong");
     }
   };

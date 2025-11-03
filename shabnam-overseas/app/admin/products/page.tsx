@@ -106,14 +106,14 @@ function ProductsContent() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      console.log("Fetching products with params:", {
-        search: search.trim(),
-        category: categoryFilter,
-        size: sizeFilter,
-        sort: sortBy,
-        page: showAll ? 1 : page,
-        limit: showAll ? 9999 : 12,
-      });
+      // console.log("Fetching products with params:", {
+      //   search: search.trim(),
+      //   category: categoryFilter,
+      //   size: sizeFilter,
+      //   sort: sortBy,
+      //   page: showAll ? 1 : page,
+      //   limit: showAll ? 9999 : 12,
+      // });
 
       const { data } = await axios.get("/products", {
         params: {
@@ -126,7 +126,7 @@ function ProductsContent() {
         },
       });
 
-      console.log("API Response:", data);
+      // console.log("API Response:", data);
 
       // Handle response
       const productsArray = data.products || [];
@@ -170,7 +170,7 @@ function ProductsContent() {
         setAllSizes(sizes);
       }
     } catch (error) {
-      console.error("Failed to fetch products:", error);
+      // console.error("Failed to fetch products:", error);
       toast.error("Failed to fetch products");
       setProducts([]);
     } finally {
@@ -207,7 +207,7 @@ function ProductsContent() {
       // Refresh the current view
       await fetchProducts();
     } catch (error) {
-      console.error("Delete failed:", error);
+      // console.error("Delete failed:", error);
       toast.error("Delete failed");
     }
   };

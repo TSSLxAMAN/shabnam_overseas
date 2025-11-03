@@ -185,7 +185,7 @@ export const protect = asyncHandler(async (req: AuthRequest, res: Response, next
       res.status(401);
       throw new Error("Not authorized, user or admin not found");
     } catch (err) {
-      console.error("❌ JWT error:", err);
+      // console.error("❌ JWT error:", err);
       res.status(401);
       throw new Error("Not authorized, token failed");
     }
@@ -200,10 +200,10 @@ export const protectAdmin = asyncHandler(async (req: AuthRequest, res: Response,
   let token;
 
   if (req.headers.authorization?.startsWith("Bearer")) {
-    console.log(
-      "🔹 Authorization header from frontend:",
-      req.headers.authorization
-    ); // <--- ADD THIS
+    // console.log(
+    //   "🔹 Authorization header from frontend:",
+    //   req.headers.authorization
+    // ); // <--- ADD THIS
 
     token = req.headers.authorization.split(" ")[1];
     // console.log("🔹 Received Admin Token:", token);
@@ -223,7 +223,7 @@ export const protectAdmin = asyncHandler(async (req: AuthRequest, res: Response,
       req.admin = admin;
       next();
     } catch (err) {
-      console.error("❌ JWT verification error:", err);
+      // console.error("❌ JWT verification error:", err);
       res.status(401);
       throw new Error("Not authorized, token failed");
     }

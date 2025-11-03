@@ -38,7 +38,7 @@ export default function Footer() {
         toast.error("Failed to sign up. Please try again.", { id: toastId });
       }
     } catch (error: any) {
-      console.error("VIP signup error:", error);
+      // console.error("VIP signup error:", error);
       const errorMessage =
         error.response?.data?.message ||
         "Something went wrong. Please try again.";

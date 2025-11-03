@@ -44,7 +44,7 @@ export const registerTrade = async (
       data: tradeUser,
     });
   } catch (error: any) {
-    console.error("Error registering trade user:", error);
+    // console.error("Error registering trade user:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -126,7 +126,7 @@ export const approveTrade = async (req: Request, res: Response) => {
       data: tradeUser,
     });
   } catch (error: any) {
-    console.error(error);
+    // console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -166,7 +166,7 @@ export const unverifyTrade = async (
       data: tradeUser,
     });
   } catch (error: any) {
-    console.error(error);
+    // console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
