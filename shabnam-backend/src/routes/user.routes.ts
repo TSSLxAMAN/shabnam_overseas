@@ -25,6 +25,7 @@ router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.get("/reset-password/:token", verifyResetToken);
 router.post("/reset-password/:token", resetPassword);
 
+router.put("/reset-password/:token", resetPassword);
 // Profile
 router.get("/profile", protect, getUserProfile);
 router.put("/profile", protect, updateUserProfile);
