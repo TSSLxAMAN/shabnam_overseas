@@ -48,7 +48,7 @@ export default function LoginPage() {
         </section>
 
         {/* Form Section */}
-        <section className="px-6 lg:px-12">
+        <section className="px-6 lg:px-12 pb-12">
           <form
             onSubmit={handleLogin}
             className="bg-white border shadow-lg rounded-2xl w-full max-w-md mx-auto mt-10 p-6 sm:p-8 space-y-4"

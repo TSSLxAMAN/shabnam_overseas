@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
       {/* always-white navbar, no scroll effect */}
       <Navbar forceWhite disableScrollEffect />
 
-      <main className="pt-[170px] bg-white text-black w-full">
+      <main className="pt-[125px] bg-white text-black w-full">
         {/* hero header (matches your appointment page) */}
         <section className="text-center bg-[#f5dfd6] px-4 sm:px-6 flex items-center justify-center">
           <div className="w-full max-w-5xl py-12 sm:py-16 md:py-20">
@@ -142,7 +142,7 @@ export default function ForgotPasswordPage() {
         </section>
 
         {/* card */}
-        <section className="max-w-5xl mx-auto mt-10 px-6 lg:px-12 pb-20">
+        <section className="max-w-5xl mx-auto mt-10 px-6 lg:px-12 pb-12">
           <div className="mx-auto w-full max-w-md bg-[#f2f2f2] p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200">
             {/* banners */}
             {message && (

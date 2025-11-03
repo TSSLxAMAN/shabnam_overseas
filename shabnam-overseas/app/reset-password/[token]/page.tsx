@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import Navbar from '@/components/Navbar';
@@ -21,6 +21,7 @@ function ResetPasswordContent() {
 
   const [loading, setLoading] = useState(false);
   const [validToken, setValidToken] = useState(false);
+ const params = useParams();
 
   // derive simple strength & match state (purely UI)
   const strength = useMemo(() => {
@@ -42,11 +43,17 @@ function ResetPasswordContent() {
       setToken(q);
       return;
     }
+
+    if (params?.token) {
+      setToken(Array.isArray(params.token) ? params.token[0] : params.token);
+      return;
+    }
+
     if (typeof window !== "undefined") {
       const last = window.location.pathname.split("/").pop();
       setToken(last || null);
     }
-  }, [searchParams]);
+  }, [searchParams, params]);
 
   useEffect(() => {
     const verifyToken = async () => {
