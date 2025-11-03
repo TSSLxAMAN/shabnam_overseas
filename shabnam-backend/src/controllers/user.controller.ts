@@ -153,7 +153,7 @@ export const forgotPassword = asyncHandler(
     user.resetPasswordExpire = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     await user.save();
 
-    const resetUrl = `http://localhost:5173/reset-password/${rawToken}`;
+    const resetUrl = `https://www.shabnamoverseas.com/reset-password/${rawToken}`;
     const html = `
     <p>Hello ${user.name},</p>
     <p>You requested a password reset. Click below:</p>
