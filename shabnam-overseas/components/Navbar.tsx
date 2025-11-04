@@ -489,7 +489,7 @@ export default function Navbar({
 
       {/* Slide-down search below navbar */}
       <div
-        className={`border-t transition-[max-height] duration-300 overflow-hidden ${
+        className={`border-t transition-[max-height]   duration-300 overflow-hidden ${
           showSearch
             ? "max-h-[420px] border-neutral-200"
             : "max-h-0 border-transparent"
@@ -503,10 +503,16 @@ export default function Navbar({
       </div>
 
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-white text-black z-[80] p-6 overflow-y-auto transition-transform duration-300 transform translate-x-0">
+        <div
+          className={`border-t transition-[max-height]   duration-300 overflow-hidden p-6 ${
+            isMobileMenuOpen
+              ? "max-h-[520px] border-neutral-200"
+              : "max-h-0 border-transparent"
+          }`}
+        >
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="absolute top-6 right-6"
+            className="absolute top-20 right-6"
           >
             <X size={28} />
           </button>
