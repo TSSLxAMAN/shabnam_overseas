@@ -750,7 +750,39 @@ export default function ProductDetailPage() {
                       title="Shipping & Returns "
                       content={
                         product.shippingReturns ||
-                        "Free shipping on orders over ₹10,000. 30-day return policy. Items must be in original condition. Contact customer service for return authorization."
+                        `We craft each made-to-order rug to your specification. To set expectations clearly:
+
+Production lead time (from order confirmation)
+
+Small rugs (e.g., up to ~4×6 ft): 6–8 weeks
+
+Medium rugs (e.g., ~6×9 to 8×10 ft): 8–12 weeks
+
+Large rugs (e.g., 9×12 ft and above or highly detailed pieces): 10–16 weeks
+
+International transit & customs
+
+Once dispatched, international transit typically takes 2–6 weeks, depending on destination, chosen shipping method, and local customs processing. Some destinations may experience longer delays.
+
+Estimated total delivery window (order → delivered)
+
+Small rugs: 8–14 weeks
+
+Medium rugs: 10–18 weeks
+
+Large rugs: 12–22 weeks
+
+Faster options & costs
+
+We offer expedited shipping (transit 1–3 weeks) for an additional fee. Expedited service reduces transit time but does not shorten the production lead time. Please contact us for exact expedited rates.
+
+Customs & import duties
+
+Import duties, taxes, and any customs clearance fees are the responsibility of the recipient and may add time to delivery.
+
+Why timelines vary
+
+Handcrafted production, size and complexity, seasonal order volumes, and customs processes all affect delivery times. We’ll always confirm an estimated ship date when you place your order and notify you with tracking once your rug has left our workshop.`
                       }
                       isOpen={openAccordion === "shipping"}
                       onToggle={() =>

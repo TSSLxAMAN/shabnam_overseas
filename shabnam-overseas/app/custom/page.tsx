@@ -144,7 +144,7 @@ export default function CustomPage() {
         <section className="max-w-5xl mx-auto space-y-20 px-6 py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <img
-              src="/images/send-design.jpg"
+              src="/images/Send_us.jpg"
               alt="Send Your Ideas"
               className="rounded-2xl shadow-lg"
             />
@@ -172,7 +172,7 @@ export default function CustomPage() {
               </p>
             </div>
             <img
-              src="/images/rug-making.jpg"
+              src="/images/Rug_Prod.jpg"
               alt="Rug Production"
               className="rounded-2xl shadow-lg"
             />
@@ -180,7 +180,7 @@ export default function CustomPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <img
-              src="/images/artisans.jpg"
+              src="/images/Generation.jpg"
               alt="Artisans"
               className="rounded-2xl shadow-lg"
             />

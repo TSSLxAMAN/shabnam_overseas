@@ -36,7 +36,7 @@ export default function ShopByCategory() {
   }
 
   return (
-    <section className="w-full bg-[#f6f5f5] py-16 px-6 overflow-x-hidden">
+    <section className="w-full bg-white py-16 px-6 overflow-x-hidden">
       <h2 className="text-center text-4xl font-[AdvercaseFont-Demo-Regular] mb-12 text-black">SHOP BY CATEGORY</h2>
 
       <div className="relative w-full hidden md:block">

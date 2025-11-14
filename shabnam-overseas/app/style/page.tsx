@@ -5,7 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Heart, Eye } from "lucide-react";
+import { Heart, Eye, ArrowUpFromDot } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -31,6 +31,33 @@ function StylePageContent() {
   };
 
   const STYLES = ["MODERN", "TRADITIONAL", "BOHEMIAN", "MINIMALIST", "VINTAGE"];
+
+  // Extract unique sizes and colors from products
+  const extractUniqueFilters = (products: Product[]) => {
+    const sizes = new Set<string>();
+    const colors = new Set<string>();
+    let minPrice = Infinity;
+    let maxPrice = 0;
+
+    products.forEach((product) => {
+      product.sizes?.forEach((size) => {
+        sizes.add(size.label);
+        minPrice = Math.min(minPrice, size.price);
+        maxPrice = Math.max(maxPrice, size.price);
+      });
+      product.colors?.forEach((color) => {
+        colors.add(color.label);
+      });
+    });
+
+    return {
+      sizes: Array.from(sizes).sort(),
+      colors: Array.from(colors).sort(),
+      minPrice: minPrice === Infinity ? 0 : minPrice,
+      maxPrice,
+    };
+  };
+
   const convertCurrency = (value: number) =>
     `₹${value.toLocaleString("en-IN")}`;
 
@@ -39,21 +66,36 @@ function StylePageContent() {
   const urlFilter = searchParams.get("filter");
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
 
+  // Filter states
+  const [priceMin, setPriceMin] = useState<string>("");
+  const [priceMax, setPriceMax] = useState<string>("");
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+
+  // Available filters
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+  const [availableColors, setAvailableColors] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
+
+  // Helper function to toggle array values
+  const toggleInArray = <T,>(array: T[], value: T): T[] =>
+    array.includes(value)
+      ? array.filter((item) => item !== value)
+      : [...array, value];
+
   // Initialize selected styles from URL parameter
   useEffect(() => {
     if (selectedStyles.length > 0) {
-      // For style page, use style:MODERN format
       const filterValue = `style:${selectedStyles.join(",")}`;
       fetchFilteredProducts(filterValue);
     } else if (urlFilter) {
-      // For other pages, use the URL filter directly
       fetchFilteredProducts(urlFilter);
     } else {
-      // Show all products if no filter
       fetchFilteredProducts("");
     }
   }, [selectedStyles.join("|"), urlFilter]);
@@ -93,41 +135,98 @@ function StylePageContent() {
       )}`;
       const res = await axios.get(url);
       const data = res.data?.products ?? [];
+      setAllProducts(data);
       setProducts(data);
+
+      // Extract available filters from products
+      const filters = extractUniqueFilters(data);
+      setAvailableSizes(filters.sizes);
+      setAvailableColors(filters.colors);
+      setPriceRange({ min: filters.minPrice, max: filters.maxPrice });
+
+      // Reset price inputs to show full range
+      setPriceMin(filters.minPrice.toString());
+      setPriceMax(filters.maxPrice.toString());
     } catch (error: any) {
-      // console.error("Failed to fetch products", error?.message || error);
       toast.error("Failed to load products.");
       setProducts([]);
+      setAllProducts([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Apply filters whenever filter states change
+  useEffect(() => {
+    applyFilters();
+  }, [priceMin, priceMax, selectedSizes, selectedColors, allProducts]);
+
+  const applyFilters = () => {
+    if (allProducts.length === 0) return;
+
+    let filtered = [...allProducts];
+
+    // Price filter
+    const minPrice = parseFloat(priceMin) || priceRange.min;
+    const maxPrice = parseFloat(priceMax) || priceRange.max;
+
+    filtered = filtered.filter((product) =>
+      product.sizes?.some(
+        (size) => size.price >= minPrice && size.price <= maxPrice
+      )
+    );
+
+    // Size filter
+    if (selectedSizes.length > 0) {
+      filtered = filtered.filter((product) =>
+        product.sizes?.some((size) => selectedSizes.includes(size.label))
+      );
+    }
+
+    // Color filter
+    if (selectedColors.length > 0) {
+      filtered = filtered.filter((product) =>
+        product.colors?.some((color) => selectedColors.includes(color.label))
+      );
+    }
+
+    setProducts(filtered);
   };
 
   // Preload wishlist
   const preloadWishlist = async () => {
     if (!user?.token) return;
     try {
-      const r1 = await axios.get("https://www.shabnamoverseas.com/api/users/wishlist", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const r1 = await axios.get(
+        "https://www.shabnamoverseas.com/api/users/wishlist",
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
       const ids1 = normalizeWishlistIds(r1.data);
       if (ids1.length || Array.isArray(r1.data)) {
         setWishlist(new Set(ids1));
         return;
       }
 
-      const r2 = await axios.get("https://www.shabnamoverseas.com/api/users/me", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const r2 = await axios.get(
+        "https://www.shabnamoverseas.com/api/users/me",
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
       const ids2 = normalizeWishlistIds(r2.data);
       if (ids2.length) {
         setWishlist(new Set(ids2));
         return;
       }
 
-      const r3 = await axios.get("https://www.shabnamoverseas.com/api/users/profile", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const r3 = await axios.get(
+        "https://www.shabnamoverseas.com/api/users/profile",
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
       const ids3 = normalizeWishlistIds(r3.data);
       setWishlist(new Set(ids3));
     } catch (err) {
@@ -205,6 +304,110 @@ function StylePageContent() {
     return Math.min(...sizes.map((size) => size.price));
   };
 
+  // Filter Content Component
+  const FilterContent = () => (
+    <div className="space-y-6">
+      {/* Price */}
+      <details className="group bg-[#f9f9f9] rounded-2xl shadow-lg" open>
+        <summary className="cursor-pointer list-none px-5 py-4 font-medium flex items-center justify-between">
+          <span>Price</span>
+          <span className="transition group-open:-rotate-180">
+            <ArrowUpFromDot size={16} strokeWidth={1.25} absoluteStrokeWidth />
+          </span>
+        </summary>
+        <div className="px-5 pb-5 text-sm text-gray-700">
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              placeholder="Min"
+              value={priceMin}
+              onChange={(e) => setPriceMin(e.target.value)}
+              className="w-24 p-2 rounded border outline-none focus:ring-2 focus:ring-[#742402]/30"
+            />
+            <span>to </span>
+            <input
+              type="number"
+              placeholder="Max"
+              value={priceMax}
+              onChange={(e) => setPriceMax(e.target.value)}
+              className="w-24 p-2 rounded border outline-none focus:ring-2 focus:ring-[#742402]/30"
+            />
+          </div>
+          <div className="mt-2 text-xs text-gray-500">
+            Range: {convertCurrency(priceRange.min)} -{" "}
+            {convertCurrency(priceRange.max)}
+          </div>
+        </div>
+      </details>
+
+      {/* Size (multi) */}
+      <details className="group bg-[#f9f9f9] rounded-2xl shadow-lg" open>
+        <summary className="cursor-pointer list-none px-5 py-4 font-medium flex items-center justify-between">
+          <span>Size (ft)</span>
+          <span className="transition group-open:-rotate-180">
+            <ArrowUpFromDot size={16} strokeWidth={1.25} absoluteStrokeWidth />
+          </span>
+        </summary>
+        <div className="px-5 pb-4 text-sm max-h-60 overflow-y-auto">
+          {availableSizes.map((size) => (
+            <label key={size} className="flex items-center gap-2 py-1">
+              <input
+                type="checkbox"
+                checked={selectedSizes.includes(size)}
+                onChange={() => setSelectedSizes((s) => toggleInArray(s, size))}
+                className="accent-[#742402]"
+              />
+              {size}
+            </label>
+          ))}
+        </div>
+      </details>
+
+      {/* Color (multi) */}
+      <details className="group bg-[#f9f9f9] rounded-2xl shadow-lg" open>
+        <summary className="cursor-pointer list-none px-5 py-4 font-medium flex items-center justify-between">
+          <span>Color</span>
+          <span className="transition group-open:-rotate-180">
+            <ArrowUpFromDot size={16} strokeWidth={1.25} absoluteStrokeWidth />
+          </span>
+        </summary>
+        <div className="px-5 pb-4 text-sm max-h-60 overflow-y-auto">
+          {availableColors.map((color) => (
+            <label key={color} className="flex items-center gap-2 py-1">
+              <input
+                type="checkbox"
+                checked={selectedColors.includes(color)}
+                onChange={() =>
+                  setSelectedColors((c) => toggleInArray(c, color))
+                }
+                className="accent-[#742402]"
+              />
+              {color}
+            </label>
+          ))}
+        </div>
+      </details>
+
+      {/* Clear Filters */}
+      {(selectedSizes.length > 0 ||
+        selectedColors.length > 0 ||
+        priceMin !== priceRange.min.toString() ||
+        priceMax !== priceRange.max.toString()) && (
+        <button
+          onClick={() => {
+            setSelectedSizes([]);
+            setSelectedColors([]);
+            setPriceMin(priceRange.min.toString());
+            setPriceMax(priceRange.max.toString());
+          }}
+          className="w-full px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-xl transition"
+        >
+          Clear All Filters
+        </button>
+      )}
+    </div>
+  );
+
   // UI
   const content = useMemo(() => {
     if (loading) {
@@ -226,7 +429,7 @@ function StylePageContent() {
     if (!products.length) {
       return (
         <div className="text-center py-16 text-gray-600">
-          No products matching the selected styles were found.
+          No products matching the selected filters were found.
         </div>
       );
     }
@@ -383,12 +586,25 @@ function StylePageContent() {
 
         <section className="px-4 sm:px-6 lg:px-10 pb-20 mt-10">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-600">
-                {products.length} products
-              </p>
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Filters Sidebar */}
+              <div className="lg:w-80 flex-shrink-0">
+                <div className="sticky top-32">
+                  <h2 className="text-lg font-semibold mb-4">Filters</h2>
+                  <FilterContent />
+                </div>
+              </div>
+
+              {/* Products Grid */}
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-6">
+                  <p className="text-sm text-gray-600">
+                    {products.length} products
+                  </p>
+                </div>
+                {content}
+              </div>
             </div>
-            {content}
           </div>
         </section>
       </main>
