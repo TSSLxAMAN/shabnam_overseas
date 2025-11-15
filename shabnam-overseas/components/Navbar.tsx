@@ -36,13 +36,12 @@ export default function Navbar({
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // NEW: navbar visibility
-  const [lastScrollY, setLastScrollY] = useState(0); // NEW: track last scroll position
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { user, admin, logout, adminLogout } = useAuth();
   const router = useRouter();
 
-  // map top-level labels -> exact routes (used for top row clicks)
   const linkMap: Record<string, string> = {
     Shop: "/shop",
     Style: "/style",
@@ -61,25 +60,23 @@ export default function Navbar({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [forceWhite, disableScrollEffect]);
 
-  // NEW: Auto-hide/show navbar on scroll
+  // Modified: Auto-hide/show navbar on scroll (disabled when mobile menu is open)
   useEffect(() => {
     const handleScroll = () => {
+      // Don't hide navbar when mobile menu or search is open
+      if (isMobileMenuOpen || showSearch) {
+        return;
+      }
+
       const currentScrollY = window.scrollY;
 
-      // Show navbar when:
-      // 1. At the top of the page (< 10px)
-      // 2. Scrolling up
       if (currentScrollY < 10) {
         setIsVisible(true);
       } else if (currentScrollY < lastScrollY) {
-        // Scrolling up
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down and past 100px
         setIsVisible(false);
-        // Close dropdowns when hiding
         setActiveDropdown(null);
-        setShowSearch(false);
       }
 
       setLastScrollY(currentScrollY);
@@ -87,7 +84,19 @@ export default function Navbar({
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, isMobileMenuOpen, showSearch]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -148,27 +157,27 @@ export default function Navbar({
         links: [
           {
             text: "Designer Stories",
-            image: "/images/hero1.jpg",
+            image: "/images/ss1.jpg",
             desc: "Discover unique perspectives",
           },
           {
             text: "Behind the Loom",
-            image: "/images/hero1.jpg",
+            image: "/images/ss2.jpg",
             desc: "See the weaving process",
           },
           {
             text: "Styling Tips",
-            image: "/images/hero1.jpg",
+            image: "/images/ss3.jpg",
             desc: "Get inspired with expert ideas",
           },
           {
             text: "Customer Stories",
-            image: "/images/hero1.jpg",
+            image: "/images/ss4.jpg",
             desc: "Real homes. Real style.",
           },
           {
             text: "Journal",
-            image: "/images/hero1.jpg",
+            image: "/images/ss5.jpg",
             desc: "Thoughts and news",
           },
         ],
@@ -186,7 +195,6 @@ export default function Navbar({
       ? "bg-white text-black shadow-md"
       : "bg-transparent text-white";
 
-  /** Build /shop?... or /style?... based on parent label + section */
   const buildFilterHref = (
     parentLabel: string,
     sectionTitle: string,
@@ -222,7 +230,6 @@ export default function Navbar({
     return `${base}?${key}=${encodeURIComponent(label.toUpperCase())}`;
   };
 
-  /** Single dropdown renderer under the nav (prevents hover gaps/flicker) */
   const renderDropdown = (label: string | null) => {
     if (!label) return null;
     if (label === "Custom" || label === "Trade") return null;
@@ -281,7 +288,6 @@ export default function Navbar({
               ))}
             </div>
           ) : (
-            // Shop dropdown
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {dropdownContent.Shop.map((section, idx) => (
                 <div key={idx}>
@@ -321,13 +327,12 @@ export default function Navbar({
     <header
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${backgroundClass} ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
-      }`}
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+        isMobileMenuOpen ? "bg-white text-black shadow-md" : backgroundClass
+      } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
     >
       {/* Top bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4 flex justify-between items-center">
-        {/* LEFT: appointment + (mobile) search + menu */}
         <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs font-light uppercase">
           <Link
             href="/appointment"
@@ -337,7 +342,6 @@ export default function Navbar({
             <span className="hidden sm:inline">Book an appointment</span>
           </Link>
 
-          {/* Mobile search toggle (moves to left on small screens) */}
           <button
             aria-label="Toggle search"
             className="block lg:hidden p-1.5 rounded-md hover:bg-black/5"
@@ -354,7 +358,6 @@ export default function Navbar({
           </button>
         </div>
 
-        {/* LOGO */}
         <Link
           href="/"
           className="font-[ShabnamElegant] text-sm sm:text-xl md:text-2xl lg:text-4xl tracking-widest whitespace-nowrap"
@@ -362,9 +365,7 @@ export default function Navbar({
           SHABNAM OVERSEAS
         </Link>
 
-        {/* RIGHT: desktop search + wishlist + user + cart */}
         <div className="flex items-center gap-2 sm:gap-4 relative">
-          {/* Desktop search toggle */}
           <button
             aria-label="Toggle search"
             className="hidden lg:inline-flex p-1.5 rounded-md hover:bg-black/5"
@@ -447,7 +448,7 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* Desktop nav — dropdown lives inside THIS element, so no hover gaps */}
+      {/* Desktop nav */}
       <nav
         className="hidden lg:block mt-2 border-t border-white/20 relative z-[60]"
         onMouseLeave={() => {
@@ -483,13 +484,12 @@ export default function Navbar({
           ))}
         </div>
 
-        {/* Single dropdown panel for whichever label is active */}
         {renderDropdown(activeDropdown)}
       </nav>
 
       {/* Slide-down search below navbar */}
       <div
-        className={`border-t transition-[max-height]   duration-300 overflow-hidden ${
+        className={`border-t transition-[max-height] duration-300 overflow-hidden ${
           showSearch
             ? "max-h-[420px] border-neutral-200"
             : "max-h-0 border-transparent"
@@ -502,101 +502,108 @@ export default function Navbar({
         </div>
       </div>
 
+      {/* Mobile Menu - Fixed overlay with independent scrolling */}
       {isMobileMenuOpen && (
-        <div
-          className={`border-t transition-[max-height]   duration-300 overflow-hidden p-6 ${
-            isMobileMenuOpen
-              ? "max-h-[520px] border-neutral-200"
-              : "max-h-0 border-transparent"
-          }`}
-        >
-          <button
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="absolute top-20 right-6"
-          >
-            <X size={28} />
-          </button>
-          <ul className="space-y-6 mt-12 text-lg uppercase font-light">
-            {navLinks.map(({ label, dropdown }) => (
-              <li key={label}>
-                {dropdown ? (
-                  <div>
-                    {/* Main label - clickable link */}
+        <div className="fixed inset-0 bg-white z-[100] lg:hidden">
+          {/* Fixed header within mobile menu */}
+          <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 flex justify-between items-center">
+            <Link
+              href="/"
+              className="font-[ShabnamElegant] text-xl tracking-widest"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              SHABNAM OVERSEAS
+            </Link>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 hover:bg-gray-100 rounded-md"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Scrollable content */}
+          <div className="overflow-y-auto bg-white h-[calc(100vh-73px)] px-6 py-6">
+            <ul className="space-y-6 text-lg uppercase font-light">
+              {navLinks.map(({ label, dropdown }) => (
+                <li key={label}>
+                  {dropdown ? (
+                    <div>
+                      <Link
+                        href={
+                          linkMap[label] ||
+                          `/${label.toLowerCase().replace(/\s+/g, "-")}`
+                        }
+                        className="block hover:text-sand py-2"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {label}
+                      </Link>
+                      <button
+                        onClick={() => toggleMobileDropdown(label)}
+                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-sand mt-1"
+                        aria-label={`Toggle ${label} submenu`}
+                      >
+                        View all {label.toLowerCase()} categories
+                        {mobileDropdowns[label] ? (
+                          <ChevronUp size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
+                      </button>
+                      {mobileDropdowns[label] && (
+                        <ul className="pl-4 mt-2 space-y-2 text-sm">
+                          {(dropdownContent as any)[label].map(
+                            (section: any, idx: number) => (
+                              <li key={idx}>
+                                <h5 className="font-semibold text-xs mb-1">
+                                  {section.title}
+                                </h5>
+                                <ul className="space-y-1">
+                                  {section.links.map((lnk: any, i: number) => {
+                                    const labelText =
+                                      typeof lnk === "string" ? lnk : lnk.text;
+                                    return (
+                                      <li key={i}>
+                                        <Link
+                                          href={buildFilterHref(
+                                            label,
+                                            section.title,
+                                            labelText
+                                          )}
+                                          className="block hover:text-sand"
+                                          onClick={() =>
+                                            setIsMobileMenuOpen(false)
+                                          }
+                                        >
+                                          {labelText}
+                                        </Link>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      )}
+                    </div>
+                  ) : (
                     <Link
                       href={
                         linkMap[label] ||
                         `/${label.toLowerCase().replace(/\s+/g, "-")}`
                       }
-                      className="block hover:text-sand py-2"
+                      className="flex justify-between items-center w-full hover:text-sand"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {label}
                     </Link>
-                    {/* Separate dropdown toggle */}
-                    <button
-                      onClick={() => toggleMobileDropdown(label)}
-                      className="flex items-center gap-2 text-sm text-gray-600 hover:text-sand mt-1"
-                      aria-label={`Toggle ${label} submenu`}
-                    >
-                      View all {label.toLowerCase()} categories
-                      {mobileDropdowns[label] ? (
-                        <ChevronUp size={16} />
-                      ) : (
-                        <ChevronRight size={16} />
-                      )}
-                    </button>
-                    {mobileDropdowns[label] && (
-                      <ul className="pl-4 mt-2 space-y-2 text-sm">
-                        {(dropdownContent as any)[label].map(
-                          (section: any, idx: number) => (
-                            <li key={idx}>
-                              <h5 className="font-semibold text-xs mb-1">
-                                {section.title}
-                              </h5>
-                              <ul className="space-y-1">
-                                {section.links.map((lnk: any, i: number) => {
-                                  const labelText =
-                                    typeof lnk === "string" ? lnk : lnk.text;
-                                  return (
-                                    <li key={i}>
-                                      <Link
-                                        href={buildFilterHref(
-                                          label,
-                                          section.title,
-                                          labelText
-                                        )}
-                                        className="block hover:text-sand"
-                                        onClick={() =>
-                                          setIsMobileMenuOpen(false)
-                                        }
-                                      >
-                                        {labelText}
-                                      </Link>
-                                    </li>
-                                  );
-                                })}
-                              </ul>
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  <Link
-                    href={
-                      linkMap[label] ||
-                      `/${label.toLowerCase().replace(/\s+/g, "-")}`
-                    }
-                    className="flex justify-between items-center w-full hover:text-sand"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {label}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </header>
