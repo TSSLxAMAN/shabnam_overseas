@@ -4,7 +4,18 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { ShoppingCart, Heart, ChevronDown } from "lucide-react";
+import {
+  ShoppingCart,
+  Heart,
+  ChevronDown,
+  Globe,
+  Hand,
+  Sparkles,
+  Recycle,
+  Users,
+  Home,
+  ArrowRight,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthContext } from "@/app/context/UserAuthContext";
@@ -20,7 +31,6 @@ type Product = {
   byType: string;
   byRoom: string;
   style: string;
-  // New fields for additional details
   dimensions?: string;
   material?: string;
   careInformation?: string;
@@ -94,7 +104,6 @@ const ProductCard = ({
           const discountValue = res.data?.data?.[0]?.value || 0;
           setDiscount(discountValue);
         } catch (err) {
-          // console.error("Error fetching discount:", err);
           setDiscount(0);
         }
       })();
@@ -112,7 +121,7 @@ const ProductCard = ({
         const wishlistIds = data.map((item: any) => item._id || item);
         setWishlistedIds(new Set(wishlistIds));
       } catch (error) {
-        // console.error("Error fetching wishlist:", error);
+        // handle error
       }
     };
     fetchWishlist();
@@ -288,7 +297,6 @@ export default function ProductDetailPage() {
           const discountValue = res.data?.data?.[0]?.value || 0;
           setDiscount(discountValue);
         } catch (err) {
-          // console.error("Error fetching discount:", err);
           setDiscount(0);
         }
       })();
@@ -315,7 +323,6 @@ export default function ProductDetailPage() {
         }
         setQuantity(1);
       } catch (err) {
-        // console.error("Error fetching product:", err);
         setProduct(null);
       } finally {
         setLoading(false);
@@ -336,7 +343,6 @@ export default function ProductDetailPage() {
         const shuffled = filteredProducts.sort(() => 0.5 - Math.random());
         setRelatedProducts(shuffled.slice(0, 4));
       } catch (err) {
-        // console.error("Error fetching related products:", err);
         setRelatedProducts([]);
       } finally {
         setRelatedLoading(false);
@@ -359,7 +365,7 @@ export default function ProductDetailPage() {
         const wishlistIds = data.map((item: any) => item._id || item);
         setWishlistedIds(new Set(wishlistIds));
       } catch (error) {
-        // console.error("Error fetching wishlist:", error);
+        // handle error
       }
     };
     fetchWishlist();
@@ -519,7 +525,7 @@ export default function ProductDetailPage() {
         <section className="px-4 sm:px-6 lg:px-10 py-12">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-8 gap-8">
-              {/* Image Gallery - 3/4 width */}
+              {/* Image Gallery */}
               <div className="lg:col-span-5">
                 <div className="grid grid-cols-2 gap-4">
                   {images.length > 0 ? (
@@ -545,7 +551,7 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              {/* Product Details - 1/4 width */}
+              {/* Product Details */}
               <div className="lg:col-span-3 lg:sticky lg:top-[140px] self-start">
                 <div className="bg-[#f9f9f9] rounded-2xl p-1 sm:p-6">
                   <div className="flex items-start justify-between gap-4">
@@ -747,7 +753,7 @@ export default function ProductDetailPage() {
                       }
                     />
                     <AccordionItem
-                      title="Shipping & Returns "
+                      title="Shipping & Returns"
                       content={
                         product.shippingReturns ||
                         `We craft each made-to-order rug to your specification. To set expectations clearly:
@@ -782,7 +788,7 @@ Import duties, taxes, and any customs clearance fees are the responsibility of t
 
 Why timelines vary
 
-Handcrafted production, size and complexity, seasonal order volumes, and customs processes all affect delivery times. We’ll always confirm an estimated ship date when you place your order and notify you with tracking once your rug has left our workshop.`
+Handcrafted production, size and complexity, seasonal order volumes, and customs processes all affect delivery times. We'll always confirm an estimated ship date when you place your order and notify you with tracking once your rug has left our workshop.`
                       }
                       isOpen={openAccordion === "shipping"}
                       onToggle={() =>
@@ -791,6 +797,171 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
                         )
                       }
                     />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Crafted by Artisan Hands Section */}
+        <section className="px-4 sm:px-6 lg:px-10 py-16 bg-[#faf8f5]">
+          <div className="max-w-7xl mx-auto">
+            {/* Top Icons */}
+            <div className="flex flex-wrap justify-center gap-8 sm:gap-16 mb-16">
+              <div className="flex items-center gap-3">
+                <Globe className="h-8 w-8 text-[#742402]" />
+                <span className="text-sm sm:text-base font-medium">
+                  Sustainable
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Hand className="h-8 w-8 text-[#742402]" />
+                <span className="text-sm sm:text-base font-medium">
+                  Handcrafted
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Sparkles className="h-8 w-8 text-[#742402]" />
+                <span className="text-sm sm:text-base font-medium">
+                  Made with Genuine Fabric
+                </span>
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Text Content */}
+              <div className="space-y-6">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-gray-900">
+                  Crafted by Artisan Hands
+                </h2>
+
+                <p className="text-gray-700 leading-relaxed">
+                  Every Jaipurrugs creation tells a story of heritage and
+                  craftsmanship that spans generations. Our rugs are
+                  meticulously handcrafted by skilled artisans in Jaipur, India,
+                  using techniques passed down through families for centuries.
+                </p>
+
+                <p className="text-gray-700 leading-relaxed">
+                  We work directly with artisan communities, ensuring fair wages
+                  and preserving traditional craftsmanship. Each rug takes 3-6
+                  months to complete, with master weavers tying thousands of
+                  individual knots by hand.
+                </p>
+
+                {/* Features */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                  <div className="flex items-start gap-2">
+                    <Recycle className="h-5 w-5 text-[#742402] flex-shrink-0 mt-1" />
+                    <div>
+                      <div className="font-medium text-sm">
+                        Fair Trade Certified
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Globe className="h-5 w-5 text-[#742402] flex-shrink-0 mt-1" />
+                    <div>
+                      <div className="font-medium text-sm">
+                        Sustainable Practices
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Users className="h-5 w-5 text-[#742402] flex-shrink-0 mt-1" />
+                    <div>
+                      <div className="font-medium text-sm">
+                        Community Support
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button className="inline-flex items-center gap-2 text-[#742402] hover:text-[#5c1c01] font-medium transition-colors group">
+                  Learn more about our artisans
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+
+              {/* Right: Image */}
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+                <Image
+                  src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80"
+                  alt="Artisan crafting rug"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How it Works Section */}
+        <section className="px-4 sm:px-6 lg:px-10 py-16 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Image */}
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg order-2 lg:order-1">
+                <Image
+                  src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=800&q=80"
+                  alt="Rug care essentials"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Right: Text Content */}
+              <div className="space-y-6 order-1 lg:order-2">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-gray-900">
+                  How it Works
+                </h2>
+
+                <p className="text-gray-700 leading-relaxed">
+                  Bringing home the right rug is simple. Choose your design, add
+                  the features you need, and let us handle the rest — from
+                  delivery to care. Quality, comfort, and convenience made easy.
+                </p>
+
+                {/* Features Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#742402]/10 flex items-center justify-center">
+                      <Recycle className="h-6 w-6 text-[#742402]" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900 mb-1">
+                        PROFESSIONAL CLEANING
+                      </div>
+                      <div className="text-sm text-gray-600">(recommended)</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#742402]/10 flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-[#742402]" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900 mb-1">
+                        STAIN RESISTANT
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 sm:col-span-2">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#742402]/10 flex items-center justify-center">
+                      <Home className="h-6 w-6 text-[#742402]" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900 mb-1">
+                        HUNDREDS OF DESIGNS
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        From traditional to contemporary, find the perfect style
+                        for your space
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
