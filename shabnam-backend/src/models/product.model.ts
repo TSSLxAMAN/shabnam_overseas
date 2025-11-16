@@ -13,7 +13,7 @@ const productSchema = new mongoose.Schema(
       {
         label: {
           type: String,
-          enum: ["2x3", "3x5", "4x6", "5x8", "6x9"], // fixed set
+
           required: true,
         },
         price: { type: Number, required: true },
@@ -26,7 +26,6 @@ const productSchema = new mongoose.Schema(
       {
         label: {
           type: String,
-          enum: ["RED", "BLUE", "BEIGE", "GREEN", "GREY"],
           required: true,
         },
       },
@@ -34,15 +33,12 @@ const productSchema = new mongoose.Schema(
 
     byType: {
       type: String,
-      enum: ["HAND-KNOTTED", "HAND-TUFTED", "FLAT WEAVE", "DHURRIE", "KILIM"],
     },
     byRoom: {
       type: String,
-      enum: ["LIVING ROOM", "BEDROOM", "DINING ROOM", "HALLWAY"],
     },
     style: {
       type: String,
-      enum: ["MODERN", "TRADITIONAL", "BOHEMIAN", "MINIMALIST", "VINTAGE"],
     },
     dimensions: {
       type: String,
