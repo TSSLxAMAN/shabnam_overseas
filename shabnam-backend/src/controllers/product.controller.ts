@@ -198,6 +198,7 @@ export const createProduct = asyncHandler(
 );
 
 // ✏️ UPDATE product
+// ✏️ UPDATE product - FIXED VERSION
 export const updateProduct = asyncHandler(
   async (req: UpdateProductRequest, res: Response) => {
     const { id } = req.params;
@@ -211,7 +212,6 @@ export const updateProduct = asyncHandler(
       byType,
       byRoom,
       style,
-      // New fields
       dimensions,
       material,
       careInformation,
@@ -236,27 +236,15 @@ export const updateProduct = asyncHandler(
     }
 
     if (!Array.isArray(colors) || colors.length === 0) {
-      res
-        .status(400)
-        .json({ message: "At least one color option is required" });
+      res.status(400).json({ message: "At least one color option is required" });
       return;
     }
 
-    // Validate sizes format
+    // Basic validation only - remove hardcoded enum checks
     for (const size of sizes!) {
       if (!size.label || !size.price || size.stock === undefined) {
         res.status(400).json({
           message: "Each size must have label, price, and stock",
-        });
-        return;
-      }
-
-      const allowedSizes = ["2x3", "3x5", "4x6", "5x8", "6x9"];
-      if (!allowedSizes.includes(size.label)) {
-        res.status(400).json({
-          message: `Invalid size label: ${
-            size.label
-          }. Allowed sizes: ${allowedSizes.join(", ")}`,
         });
         return;
       }
@@ -269,21 +257,11 @@ export const updateProduct = asyncHandler(
       }
     }
 
-    // Validate colors format
+    // Basic validation only - remove hardcoded enum checks
     for (const color of colors!) {
       if (!color.label) {
         res.status(400).json({
           message: "Each color must have a label",
-        });
-        return;
-      }
-
-      const allowedColors = ["RED", "BLUE", "BEIGE", "GREEN", "GREY"];
-      if (!allowedColors.includes(color.label)) {
-        res.status(400).json({
-          message: `Invalid color label: ${
-            color.label
-          }. Allowed colors: ${allowedColors.join(", ")}`,
         });
         return;
       }
@@ -304,7 +282,6 @@ export const updateProduct = asyncHandler(
       byType,
       byRoom,
       style,
-      // Always include new fields (even if empty strings)
       dimensions: dimensions || "",
       material: material || "",
       careInformation: careInformation || "",
