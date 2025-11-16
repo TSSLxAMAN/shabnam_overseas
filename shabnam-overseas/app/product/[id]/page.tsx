@@ -890,7 +890,7 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
                 <img
                   src="/images/ss2.jpg"
                   alt="Artisan crafting rug"
-                  className="object-cover"
+                  className=""
                 />
               </div>
             </div>
@@ -906,7 +906,7 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
                 <img
                   src="/images/stories.png"
                   alt="Rug care essentials"
-                  className="object-cover"
+                  className=""
                 />
               </div>
 
