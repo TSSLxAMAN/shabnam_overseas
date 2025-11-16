@@ -887,10 +887,9 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
 
               {/* Right: Image */}
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
-                <Image
-                  src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80"
+                <img
+                  src="/images/ss2.jpg"
                   alt="Artisan crafting rug"
-                  fill
                   className="object-cover"
                 />
               </div>
@@ -904,10 +903,9 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Left: Image */}
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg order-2 lg:order-1">
-                <Image
-                  src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=800&q=80"
+                <img
+                  src="/images/stories.png"
                   alt="Rug care essentials"
-                  fill
                   className="object-cover"
                 />
               </div>
