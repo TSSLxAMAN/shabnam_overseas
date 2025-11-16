@@ -17,7 +17,6 @@ interface Product {
   byType: string;
   byRoom: string;
   style: string;
-  // New fields
   dimensions?: string;
   material?: string;
   careInformation?: string;
@@ -25,11 +24,19 @@ interface Product {
   shippingReturns?: string;
 }
 
+interface Category {
+  _id: string;
+  name: string;
+  type: "size" | "style" | "type" | "room" | "color";
+}
+
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
   const productId = params.id;
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -40,7 +47,6 @@ export default function EditProductPage() {
     byType: "",
     byRoom: "",
     style: "",
-    // New fields
     dimensions: "",
     material: "",
     careInformation: "",
@@ -51,7 +57,29 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [originalProduct, setOriginalProduct] = useState<Product | null>(null);
 
-  // Fetch product data on mount
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("/admin/categories");
+        setCategories(res.data);
+      } catch (err) {
+        toast.error("Failed to load categories");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Filter categories by type
+  const sizesList = categories.filter((c) => c.type === "size");
+  const colorList = categories.filter((c) => c.type === "color");
+  const typeList = categories.filter((c) => c.type === "type");
+  const roomList = categories.filter((c) => c.type === "room");
+  const styleList = categories.filter((c) => c.type === "style");
+
+  // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) return;
@@ -77,7 +105,6 @@ export default function EditProductPage() {
           byType: product.byType || "",
           byRoom: product.byRoom || "",
           style: product.style || "",
-          // New fields
           dimensions: product.dimensions || "",
           material: product.material || "",
           careInformation: product.careInformation || "",
@@ -86,7 +113,6 @@ export default function EditProductPage() {
         });
       } catch (err: any) {
         toast.error("Failed to load product");
-        // console.error(err);
         router.push("/admin/products");
       } finally {
         setLoading(false);
@@ -96,7 +122,6 @@ export default function EditProductPage() {
     fetchProduct();
   }, [productId, router]);
 
-  // --- handle generic fields ---
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -106,7 +131,6 @@ export default function EditProductPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // --- size management ---
   const addSize = () => {
     setForm((prev) => ({
       ...prev,
@@ -133,7 +157,6 @@ export default function EditProductPage() {
     }));
   };
 
-  // --- color management ---
   const addColor = (color: string) => {
     if (!color) return;
     if (form.colors.some((c) => c.label === color)) {
@@ -153,7 +176,6 @@ export default function EditProductPage() {
     }));
   };
 
-  // --- upload images ---
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -190,7 +212,6 @@ export default function EditProductPage() {
       }
     } catch (err) {
       toast.error("Upload failed");
-      // console.error(err);
     } finally {
       setUploading(false);
     }
@@ -239,7 +260,6 @@ export default function EditProductPage() {
     }
 
     try {
-      // Convert sizes prices and stocks back to numbers
       const formattedSizes = form.sizes.map((size) => ({
         label: size.label,
         price: parseFloat(size.price),
@@ -256,7 +276,6 @@ export default function EditProductPage() {
       router.push("/admin/products");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Update failed");
-      // console.error(err);
     }
   };
 
@@ -264,7 +283,6 @@ export default function EditProductPage() {
     router.push("/admin/products");
   };
 
-  // ---------- UI helpers ----------
   const label = "block text-sm font-medium text-gray-800 mb-1";
   const inputBase =
     "w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#742402]/30 focus:border-[#742402]";
@@ -272,9 +290,8 @@ export default function EditProductPage() {
   const sectionCard = "rounded-2xl border border-gray-200 bg-white shadow-sm";
   const iconBtn =
     "inline-flex items-center justify-center rounded-lg border px-2 py-1 text-xs font-medium transition";
-  // ---------------------------------
 
-  if (loading) {
+  if (loading || loadingCategories) {
     return (
       <>
         <Navbar forceWhite disableScrollEffect />
@@ -354,11 +371,11 @@ export default function EditProductPage() {
                     className={selectBase}
                   >
                     <option value="">Select Type</option>
-                    <option value="HAND-KNOTTED">HAND-KNOTTED</option>
-                    <option value="HAND-TUFTED">HAND-TUFTED</option>
-                    <option value="FLAT WEAVE">FLAT WEAVE</option>
-                    <option value="DHURRIE">DHURRIE</option>
-                    <option value="KILIM">KILIM</option>
+                    {typeList.map((t) => (
+                      <option key={t._id} value={t.name}>
+                        {t.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -372,10 +389,11 @@ export default function EditProductPage() {
                     className={selectBase}
                   >
                     <option value="">Select Room</option>
-                    <option value="LIVING ROOM">LIVING ROOM</option>
-                    <option value="BEDROOM">BEDROOM</option>
-                    <option value="DINING ROOM">DINING ROOM</option>
-                    <option value="HALLWAY">HALLWAY</option>
+                    {roomList.map((r) => (
+                      <option key={r._id} value={r.name}>
+                        {r.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -389,16 +407,16 @@ export default function EditProductPage() {
                     className={selectBase}
                   >
                     <option value="">Select Style</option>
-                    <option value="MODERN">MODERN</option>
-                    <option value="TRADITIONAL">TRADITIONAL</option>
-                    <option value="BOHEMIAN">BOHEMIAN</option>
-                    <option value="MINIMALIST">MINIMALIST</option>
-                    <option value="VINTAGE">VINTAGE</option>
+                    {styleList.map((s) => (
+                      <option key={s._id} value={s.name}>
+                        {s.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* New Product Details Section */}
+              {/* Additional Product Details */}
               <div className="border-t border-gray-200 pt-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Additional Product Details
@@ -450,7 +468,7 @@ export default function EditProductPage() {
                       name="careInformation"
                       value={form.careInformation}
                       onChange={handleChange}
-                      placeholder="e.g., Vacuum regularly. Professional cleaning recommended. Avoid direct sunlight."
+                      placeholder="e.g., Vacuum regularly. Professional cleaning recommended."
                       rows={4}
                       className={inputBase}
                     />
@@ -467,7 +485,7 @@ export default function EditProductPage() {
                       name="additionalDetails"
                       value={form.additionalDetails}
                       onChange={handleChange}
-                      placeholder="e.g., Handmade in India, Unique design, Limited edition, Certificate of authenticity included"
+                      placeholder="e.g., Handmade in India, Unique design"
                       rows={4}
                       className={inputBase}
                     />
@@ -484,7 +502,7 @@ export default function EditProductPage() {
                       name="shippingReturns"
                       value={form.shippingReturns}
                       onChange={handleChange}
-                      placeholder="e.g., Free shipping on orders over ₹10,000. 30-day return policy. Items must be in original condition."
+                      placeholder="e.g., Free shipping on orders over ₹10,000"
                       rows={4}
                       className={inputBase}
                     />
@@ -504,11 +522,11 @@ export default function EditProductPage() {
                       required
                     >
                       <option value="">Select Size</option>
-                      <option value="2x3">2x3</option>
-                      <option value="3x5">3x5</option>
-                      <option value="4x6">4x6</option>
-                      <option value="5x8">5x8</option>
-                      <option value="6x9">6x9</option>
+                      {sizesList.map((sz) => (
+                        <option key={sz._id} value={sz.name}>
+                          {sz.name}
+                        </option>
+                      ))}
                     </select>
 
                     <input
@@ -562,11 +580,11 @@ export default function EditProductPage() {
                     className={selectBase}
                   >
                     <option value="">Select Color</option>
-                    <option value="RED">RED</option>
-                    <option value="BLUE">BLUE</option>
-                    <option value="BEIGE">BEIGE</option>
-                    <option value="GREEN">GREEN</option>
-                    <option value="GREY">GREY</option>
+                    {colorList.map((clr) => (
+                      <option key={clr._id} value={clr.name}>
+                        {clr.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="flex gap-2 flex-wrap">
@@ -618,7 +636,6 @@ export default function EditProductPage() {
                           className="h-32 w-full object-cover"
                         />
 
-                        {/* Order controls */}
                         <div className="absolute left-2 top-2 flex gap-1">
                           <button
                             type="button"
@@ -640,7 +657,6 @@ export default function EditProductPage() {
                           </button>
                         </div>
 
-                        {/* Delete button */}
                         <button
                           type="button"
                           onClick={() => handleDeleteImage(img)}
@@ -650,7 +666,6 @@ export default function EditProductPage() {
                           ✕
                         </button>
 
-                        {/* First image indicator */}
                         {i === 0 && (
                           <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                             Main
