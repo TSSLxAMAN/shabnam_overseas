@@ -886,11 +886,11 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
               </div>
 
               {/* Right: Image */}
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+              <div className="relative  rounded-2xl overflow-hidden shadow-lg">
                 <img
                   src="/images/ss2.jpg"
                   alt="Artisan crafting rug"
-                  className=""
+                  className="object-contain"
                 />
               </div>
             </div>
@@ -902,11 +902,11 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Left: Image */}
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg order-2 lg:order-1">
+              <div className="relative  rounded-2xl overflow-hidden shadow-lg order-2 lg:order-1">
                 <img
                   src="/images/stories.png"
                   alt="Rug care essentials"
-                  className=""
+                  className="object-contain"
                 />
               </div>
 
