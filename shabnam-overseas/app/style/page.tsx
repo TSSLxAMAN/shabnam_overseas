@@ -5,11 +5,14 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Heart, Eye, ArrowUpFromDot } from "lucide-react";
+import { Heart, Eye, ArrowUpFromDot, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthContext } from "@/app/context/UserAuthContext";
+
+// Currency types
+type Currency = "INR" | "USD";
 
 function StylePageContent() {
   type Product = {
@@ -58,9 +61,6 @@ function StylePageContent() {
     };
   };
 
-  const convertCurrency = (value: number) =>
-    `₹${value.toLocaleString("en-IN")}`;
-
   const { user } = useContext(AuthContext);
   const searchParams = useSearchParams();
   const urlFilter = searchParams.get("filter");
@@ -70,6 +70,11 @@ function StylePageContent() {
   const [loading, setLoading] = useState(true);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+
+  // Currency states
+  const [currency, setCurrency] = useState<Currency>("USD");
+  const [exchangeRate, setExchangeRate] = useState<number>(83.5);
+  const [rateLoading, setRateLoading] = useState<boolean>(true);
 
   // Filter states
   const [priceMin, setPriceMin] = useState<string>("");
@@ -81,6 +86,37 @@ function StylePageContent() {
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
   const [availableColors, setAvailableColors] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
+
+  // Fetch real-time exchange rate
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const response = await fetch(
+          "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+        );
+        const data = await response.json();
+
+        if (data?.usd?.inr) {
+          setExchangeRate(data.usd.inr);
+        }
+      } catch (error) {
+        console.error("Failed to fetch exchange rate:", error);
+      } finally {
+        setRateLoading(false);
+      }
+    };
+
+    fetchExchangeRate();
+  }, []);
+
+  // Currency formatting function
+  const formatPrice = (priceInINR: number): string => {
+    if (currency === "USD") {
+      const priceInUSD = priceInINR / exchangeRate;
+      return `$${priceInUSD.toFixed(2)}`;
+    }
+    return `₹${priceInINR.toLocaleString("en-IN")}`;
+  };
 
   // Helper function to toggle array values
   const toggleInArray = <T,>(array: T[], value: T): T[] =>
@@ -145,8 +181,7 @@ function StylePageContent() {
       setPriceRange({ min: filters.minPrice, max: filters.maxPrice });
 
       // Reset price inputs to show full range
-      setPriceMin(filters.minPrice.toString());
-      setPriceMax(filters.maxPrice.toString());
+     
     } catch (error: any) {
       toast.error("Failed to load products.");
       setProducts([]);
@@ -333,10 +368,7 @@ function StylePageContent() {
               className="w-24 p-2 rounded border outline-none focus:ring-2 focus:ring-[#742402]/30"
             />
           </div>
-          <div className="mt-2 text-xs text-gray-500">
-            Range: {convertCurrency(priceRange.min)} -{" "}
-            {convertCurrency(priceRange.max)}
-          </div>
+          
         </div>
       </details>
 
@@ -503,7 +535,7 @@ function StylePageContent() {
                   {product.description}
                 </p>
                 <div className="mt-2 font-semibold">
-                  Starting at {convertCurrency(lowestPrice)}
+                  Starting at {formatPrice(lowestPrice)}
                 </div>
 
                 {product.style && (
@@ -521,7 +553,7 @@ function StylePageContent() {
                   >
                     {product.sizes.map((size) => (
                       <option key={size.label} value={size.label}>
-                        {size.label} - {convertCurrency(size.price)}{" "}
+                        {size.label} - {formatPrice(size.price)}{" "}
                         {size.stock === 0 ? "(Out of stock)" : ""}
                       </option>
                     ))}
@@ -541,7 +573,7 @@ function StylePageContent() {
         })}
       </div>
     );
-  }, [loading, products, wishlist]);
+  }, [loading, products, wishlist, currency, exchangeRate]);
 
   return (
     <>
@@ -590,7 +622,25 @@ function StylePageContent() {
               {/* Filters Sidebar */}
               <div className="lg:w-80 flex-shrink-0">
                 <div className="sticky top-32">
-                  <h2 className="text-lg font-semibold mb-4">Filters</h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold">Filters</h2>
+
+                    {/* Currency Selector */}
+                    <div className="relative inline-block">
+                      <select
+                        value={currency}
+                        onChange={(e) =>
+                          setCurrency(e.target.value as Currency)
+                        }
+                        className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-1.5 pr-8 text-xs font-medium text-gray-700 hover:border-[#742402] focus:outline-none focus:ring-2 focus:ring-[#742402] focus:border-transparent cursor-pointer transition-all"
+                        disabled={rateLoading}
+                      >
+                        <option value="INR">₹ INR</option>
+                        <option value="USD">$ USD</option>
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500 pointer-events-none" />
+                    </div>
+                  </div>
                   <FilterContent />
                 </div>
               </div>

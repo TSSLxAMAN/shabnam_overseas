@@ -38,6 +38,17 @@ type Product = {
   shippingReturns?: string;
 };
 
+// Currency types
+type Currency = "INR" | "USD";
+
+// Currency conversion API response type
+type CurrencyRates = {
+  date: string;
+  usd: {
+    inr: number;
+  };
+};
+
 // Accordion Component
 const AccordionItem = ({
   title,
@@ -84,15 +95,17 @@ const AccordionItem = ({
 const ProductCard = ({
   product,
   onViewProduct,
+  currency,
+  formatPrice,
 }: {
   product: Product;
   onViewProduct: (id: string) => void;
+  currency: Currency;
+  formatPrice: (price: number) => string;
 }) => {
   const { user } = useContext(AuthContext);
   const [discount, setDiscount] = useState<number>(0);
   const [wishlistedIds, setWishlistedIds] = useState<Set<string>>(new Set());
-
-  const currencyINR = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
   useEffect(() => {
     if (user?.role === "trader") {
@@ -244,15 +257,15 @@ const ProductCard = ({
           {showDiscount ? (
             <div className="flex items-center gap-2">
               <span className="text-gray-500 line-through text-sm">
-                {currencyINR(originalPrice)}
+                {formatPrice(originalPrice)}
               </span>
               <span className="text-[#742402] font-bold text-lg">
-                {currencyINR(finalPrice)}
+                {formatPrice(finalPrice)}
               </span>
             </div>
           ) : (
             <span className="text-[#742402] font-bold text-lg">
-              {currencyINR(finalPrice)}
+              {formatPrice(finalPrice)}
             </span>
           )}
         </div>
@@ -270,8 +283,6 @@ const ProductCard = ({
   );
 };
 
-const currencyINR = (n: number) => `₹${n.toLocaleString("en-IN")}`;
-
 export default function ProductDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -286,6 +297,42 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
   const [openAccordion, setOpenAccordion] = useState<string>("");
+  const [currency, setCurrency] = useState<Currency>("USD");
+  const [exchangeRate, setExchangeRate] = useState<number>(83.5); // Default fallback rate
+  const [rateLoading, setRateLoading] = useState<boolean>(true);
+
+  // Fetch real-time exchange rate
+
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const response = await fetch(
+          "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+        );
+        const data = await response.json();
+
+        if (data?.usd?.inr) {
+          setExchangeRate(data.usd.inr);
+        }
+      } catch (error) {
+        console.error("Failed to fetch exchange rate:", error);
+        // Keep using the default fallback rate
+      } finally {
+        setRateLoading(false);
+      }
+    };
+
+    fetchExchangeRate();
+  }, []);
+
+  // Currency formatting function
+  const formatPrice = (priceInINR: number): string => {
+    if (currency === "USD") {
+      const priceInUSD = priceInINR / exchangeRate;
+      return `$${priceInUSD.toFixed(2)}`;
+    }
+    return `₹${priceInINR.toLocaleString("en-IN")}`;
+  };
 
   useEffect(() => {
     if (user?.role === "trader") {
@@ -553,7 +600,30 @@ export default function ProductDetailPage() {
 
               {/* Product Details */}
               <div className="lg:col-span-3 lg:sticky lg:top-[140px] self-start">
-                <div className="bg-[#f9f9f9] rounded-2xl p-1 sm:p-6">
+                <div className="bg-[#f9f9f9] rounded-2xl p-4 sm:p-6">
+                  {/* Currency Selector */}
+                  <div className="flex justify-end mb-4">
+                    <div className="relative inline-block">
+                      <select
+                        value={currency}
+                        onChange={(e) =>
+                          setCurrency(e.target.value as Currency)
+                        }
+                        className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-700 hover:border-[#742402] focus:outline-none focus:ring-2 focus:ring-[#742402] focus:border-transparent cursor-pointer transition-all"
+                        disabled={rateLoading}
+                      >
+                        <option value="INR">₹ INR</option>
+                        <option value="USD">$ USD</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+                      {rateLoading && (
+                        <div className="absolute -bottom-5 right-0 text-xs text-gray-500">
+                          Loading rate...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="flex items-start justify-between gap-4">
                     <h2 className="text-xl sm:text-2xl font-serif leading-tight">
                       {product.name}
@@ -601,10 +671,10 @@ export default function ProductDetailPage() {
                             return (
                               <div className="flex flex-col gap-2">
                                 <span className="text-gray-500 line-through text-lg">
-                                  {currencyINR(basePrice)}
+                                  {formatPrice(basePrice)}
                                 </span>
                                 <span className="text-[#742402] font-bold text-2xl">
-                                  {currencyINR(finalPrice)}
+                                  {formatPrice(finalPrice)}
                                 </span>
                                 <span className="text-sm text-green-600 font-medium">
                                   ({discount}% OFF)
@@ -613,7 +683,7 @@ export default function ProductDetailPage() {
                             );
                           }
 
-                          return currencyINR(finalPrice);
+                          return formatPrice(finalPrice);
                         })()
                       : `Select size`}
                   </div>
@@ -998,6 +1068,8 @@ Handcrafted production, size and complexity, seasonal order volumes, and customs
                     key={relatedProduct._id}
                     product={relatedProduct}
                     onViewProduct={handleViewProduct}
+                    currency={currency}
+                    formatPrice={formatPrice}
                   />
                 ))}
               </div>

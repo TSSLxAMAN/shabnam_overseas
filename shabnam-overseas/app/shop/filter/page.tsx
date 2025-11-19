@@ -69,6 +69,8 @@ function FilterContent() {
 
   // Filter states
   const [currency, setCurrency] = useState<Currency>("USD");
+  const [exchangeRate, setExchangeRate] = useState<number>(83.5); // Default fallback
+  const [rateLoading, setRateLoading] = useState<boolean>(true);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [priceMinInput, setPriceMinInput] = useState("");
@@ -81,14 +83,38 @@ function FilterContent() {
   >("featured");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
+  // Fetch real-time exchange rate
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const response = await fetch(
+          "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+        );
+        const data = await response.json();
+
+        if (data?.usd?.inr) {
+          setExchangeRate(data.usd.inr);
+        }
+      } catch (error) {
+        console.error("Failed to fetch exchange rate:", error);
+        // Keep using the default fallback rate
+      } finally {
+        setRateLoading(false);
+      }
+    };
+
+    fetchExchangeRate();
+  }, []);
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setPriceMin(priceMinInput);
       setPriceMax(priceMaxInput);
-    }, 2000); // 500ms delay
+    }, 2000);
 
     return () => clearTimeout(timeoutId);
   }, [priceMinInput, priceMaxInput]);
+
   const SIZES = useMemo(() => {
     const sizeSet = new Set<string>();
     products.forEach((product) => {
@@ -148,7 +174,6 @@ function FilterContent() {
       const data = res.data?.products ?? [];
       setProducts(data);
     } catch (error: any) {
-      // console.error("Failed to fetch products", error?.message || error);
       toast.error("Failed to load products.");
       setProducts([]);
     } finally {
@@ -243,10 +268,14 @@ function FilterContent() {
       : `${convertCurrency(min)} - ${convertCurrency(max)}`;
   };
 
-  const convertCurrency = (price: number) =>
-    currency === "INR"
-      ? `₹${price.toLocaleString("en-IN")}`
-      : `$${(price * 0.012).toFixed(2)}`;
+  // Updated currency conversion function
+  const convertCurrency = (priceInINR: number): string => {
+    if (currency === "USD") {
+      const priceInUSD = priceInINR / exchangeRate;
+      return `$${priceInUSD.toFixed(2)}`;
+    }
+    return `₹${priceInINR.toLocaleString("en-IN")}`;
+  };
 
   const toggleInArray = (arr: string[], value: string) =>
     arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
@@ -470,6 +499,7 @@ function FilterContent() {
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value as Currency)}
                   className="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#742402]/30"
+                  disabled={rateLoading}
                 >
                   <option value="INR">INR (₹)</option>
                   <option value="USD">USD ($)</option>
@@ -557,6 +587,7 @@ function FilterContent() {
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value as Currency)}
                 className="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#742402]/30"
+                disabled={rateLoading}
               >
                 <option value="INR">INR (₹)</option>
                 <option value="USD">USD ($)</option>
@@ -729,7 +760,7 @@ function FilterContent() {
                           {/* Heart - responsive size */}
                           <button
                             onClick={() => handleToggleWishlist(product._id)}
-                            className="absolute top-2 right-2 sm:top-3 sm:right-3 inline-flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full shadow hover:bg-white"
+                            className="absolute top-2 right-2 sm:top-3 sm:right-3 inline-flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/90 shadow hover:bg-white"
                             aria-label="Add to wishlist"
                           >
                             <Heart
