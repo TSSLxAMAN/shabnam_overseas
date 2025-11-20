@@ -74,7 +74,7 @@ const generateToken = (id: string) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
-// Register
+// Register with Email Verification
 export const registerUser = asyncHandler(
   async (req: RegisterRequest, res: Response) => {
     const { name, email, password } = req.body;
@@ -85,13 +85,100 @@ export const registerUser = asyncHandler(
       throw new Error("User already exists");
     }
 
-    const user = (await User.create({ name, email, password })) as any; // Type casting
+    // Create user (isVerified defaults to false)
+    const user = (await User.create({ name, email, password })) as any;
+
+    // Generate verification token
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+
+    // Save verification token to user
+    user.emailVerificationToken = hashedToken;
+    user.emailVerificationExpire = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    await user.save();
+
+    // Create verification URL
+    const verifyUrl = `https://www.shabnamoverseas.com/verify-email/${rawToken}`;
+    
+    // Email content
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #742402;">Welcome to Shabnam Overseas!</h2>
+        <p>Hello ${user.name},</p>
+        <p>Thank you for registering with us. Please verify your email address to complete your registration.</p>
+        <p>Click the button below to verify your email:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verifyUrl}" 
+             style="background-color: #742402; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Verify Email Address
+          </a>
+        </div>
+        <p>Or copy and paste this link into your browser:</p>
+        <p style="color: #742402; word-break: break-all;">${verifyUrl}</p>
+        <p style="color: #666; font-size: 14px;">This link will expire in 24 hours.</p>
+        <p style="color: #666; font-size: 14px;">If you didn't create an account, please ignore this email.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+        <p style="color: #999; font-size: 12px;">© Shabnam Overseas. All rights reserved.</p>
+      </div>
+    `;
+
+    // Send verification email
+    await sendEmail(
+      user.email,
+      "Verify Your Email - Shabnam Overseas",
+      html
+    );
 
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
+      message: "Registration successful! Please check your email to verify your account.",
       email: user.email,
-      token: generateToken(user._id.toString()),
+    });
+  }
+);
+
+// Interface for verify email request
+interface VerifyEmailRequest extends Request {
+  params: {
+    token: string;
+  };
+}
+
+// @desc    Verify user email
+// @route   GET /api/users/verify-email/:token
+// @access  Public
+export const verifyEmail = asyncHandler(
+  async (req: VerifyEmailRequest, res: Response) => {
+    const verificationToken = req.params.token;
+    
+    // Hash the token from URL
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(verificationToken)
+      .digest("hex");
+
+    // Find user with this token and check if not expired
+    const user = await User.findOne({
+      emailVerificationToken: hashedToken,
+      emailVerificationExpire: { $gt: new Date() },
+    });
+
+    if (!user) {
+      res.status(400);
+      throw new Error("Invalid or expired verification token");
+    }
+
+    // Mark user as verified
+    user.isVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpire = undefined;
+    await user.save();
+
+    res.status(200).json({
+      message: "Email verified successfully! You can now login.",
+      success: true,
     });
   }
 );
@@ -101,7 +188,7 @@ export const loginUser = asyncHandler(
   async (req: LoginRequest, res: Response) => {
     const { email, password } = req.body;
 
-    const user = (await User.findOne({ email })) as any; // Type casting
+    const user = (await User.findOne({ email })) as any;
 
     if (!user) {
       res.status(401);
@@ -113,6 +200,12 @@ export const loginUser = asyncHandler(
     if (!isPasswordMatch) {
       res.status(401);
       throw new Error("Invalid email or password");
+    }
+
+    // ✅ Check if email is verified (for regular users)
+    if (user.role === "user" && !user.isVerified) {
+      res.status(403);
+      throw new Error("Please verify your email before logging in. Check your inbox for the verification link.");
     }
 
     // ✅ Check if user is verified (for traders)
@@ -128,6 +221,83 @@ export const loginUser = asyncHandler(
       email: user.email,
       role: user.role,
       token: generateToken(user._id.toString()),
+    });
+  }
+);  
+
+// Interface for resend verification request
+interface ResendVerificationRequest extends Request {
+  body: {
+    email: string;
+  };
+}
+
+// @desc    Resend verification email
+// @route   POST /api/users/resend-verification
+// @access  Public
+export const resendVerificationEmail = asyncHandler(
+  async (req: ResendVerificationRequest, res: Response) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    // Check if user is already verified
+    if (user.isVerified) {
+      res.status(400);
+      throw new Error("Email is already verified. You can login now.");
+    }
+
+    // Generate new verification token
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+
+    // Update user with new token
+    user.emailVerificationToken = hashedToken;
+    user.emailVerificationExpire = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    await user.save();
+
+    // Create verification URL
+    const verifyUrl = `https://www.shabnamoverseas.com/verify-email/${rawToken}`;
+    
+    // Email content
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #742402;">Verify Your Email - Shabnam Overseas</h2>
+        <p>Hello ${user.name},</p>
+        <p>You requested a new verification email. Please verify your email address to complete your registration.</p>
+        <p>Click the button below to verify your email:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verifyUrl}" 
+             style="background-color: #742402; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Verify Email Address
+          </a>
+        </div>
+        <p>Or copy and paste this link into your browser:</p>
+        <p style="color: #742402; word-break: break-all;">${verifyUrl}</p>
+        <p style="color: #666; font-size: 14px;">This link will expire in 24 hours.</p>
+        <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+        <p style="color: #999; font-size: 12px;">© Shabnam Overseas. All rights reserved.</p>
+      </div>
+    `;
+
+    // Send verification email
+    await sendEmail(
+      user.email,
+      "Verify Your Email - Shabnam Overseas",
+      html
+    );
+
+    res.status(200).json({
+      message: "Verification email sent successfully. Please check your inbox.",
     });
   }
 );

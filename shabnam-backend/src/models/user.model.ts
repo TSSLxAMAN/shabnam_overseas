@@ -12,7 +12,7 @@ interface ICartItem {
   size: string;
   color: string;
   quantity: number;
-  price: number; // ✅ Added price field to store final discounted price
+  price: number;
 }
 
 export interface IUser extends Document {
@@ -23,8 +23,15 @@ export interface IUser extends Document {
   cart: ICartItem[];
   role: string;
   isVerified: boolean;
+
+  // Email verification fields
+  emailVerificationToken?: string;
+  emailVerificationExpire?: Date;
+
+  // Password reset fields
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
+
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -33,7 +40,6 @@ const userSchema = new mongoose.Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    // In user.model.ts
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -47,7 +53,7 @@ const userSchema = new mongoose.Schema<IUser>(
           ref: "Product",
           required: true,
         },
-        size: { type: String }, // ✅ add this
+        size: { type: String },
         color: { type: String },
         quantity: { type: Number, default: 1 },
         price: { type: Number, required: true },
@@ -56,6 +62,11 @@ const userSchema = new mongoose.Schema<IUser>(
     role: { type: String, enum: ["user", "trader", "admin"], default: "user" },
     isVerified: { type: Boolean, default: false },
 
+    // Email verification fields
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
+
+    // Password reset fields
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
