@@ -10,9 +10,12 @@ import { Info } from "lucide-react";
 
 const CART_USES_ITEM_ID = false;
 const UPDATE_METHOD: "put" | "patch" | "post" = "put";
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://www.shabnamoverseas.com/api";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ?? "https://www.shabnamoverseas.com/api";
 const CART_ENDPOINT = `${API_BASE}/cart`;
 const buildItemUrl = (id: string) => `${CART_ENDPOINT}/${id}`;
+
+type Currency = "INR" | "USD";
 
 // Updated Product type to match your API response
 type ProductSize = {
@@ -50,8 +53,8 @@ type CartItem = {
   product: Product | null;
   quantity: number;
   price: number;
-  size?: string; // Size as string from your API
-  color?: string; // Color as string from your API
+  size?: string;
+  color?: string;
 };
 
 const PRODUCT_PAGE_BASE = "/product";
@@ -63,16 +66,14 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [currency, setCurrency] = useState<Currency>("USD");
 
-  const INR = useMemo(
-    () =>
-      new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 0,
-      }),
-    []
-  );
+  const formatCurrency = useMemo(() => {
+    return (price: number) =>
+      currency === "INR"
+        ? `₹${price.toLocaleString("en-IN")}`
+        : `$${(price * 0.012).toFixed(2)}`;
+  }, [currency]);
 
   const productHref = (item: CartItem) => {
     const p = item.product;
@@ -95,12 +96,9 @@ export default function CartPage() {
 
   // Helper function to get item price
   const getItemPrice = (item: CartItem): number => {
-    // console.log(item)
-    // Fallback to first size price if no specific size
     if (item.price) {
       return item.price;
     }
-
     return 0;
   };
 
@@ -108,18 +106,16 @@ export default function CartPage() {
   const getAvailableStock = (item: CartItem): number => {
     if (!item.product) return 0;
 
-    // If size is specified, get stock from that size
     if (item.size) {
       const selectedSize = getSelectedSize(item);
       if (selectedSize) return selectedSize.stock;
     }
 
-    // Fallback to first size stock
     if (item.product.sizes && item.product.sizes.length > 0) {
       return item.product.sizes[0].stock;
     }
 
-    return 999; // Default high stock
+    return 999;
   };
 
   const getActionId = (item: CartItem) => {
@@ -142,23 +138,16 @@ export default function CartPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
-        // console.log("Cart API Response:", data); // Debug log
-
         const items = Array.isArray(data) ? data : data?.items || [];
-        // console.log(items)
-        // Filter out items with null products and ensure proper structure
         const validItems = items.filter((item: CartItem) => {
           if (!item.product) {
-            // console.log("Filtering out item with null product:", item._id);
             return false;
           }
           return true;
         });
 
-        // console.log("Valid cart items:", validItems); // Debug log
         setCart(validItems);
       } catch (err) {
-        // console.error("Error fetching cart", err);
         setCart([]);
       } finally {
         setLoading(false);
@@ -178,13 +167,10 @@ export default function CartPage() {
       const next = prev.filter((it) => getActionId(it) !== id);
       setCart(next);
 
-      // Use the product ID for deletion (not cart item ID)
       await axios.delete(`${CART_ENDPOINT}/${itemToRemove.product._id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
     } catch (err: any) {
-      // console.error("Error removing from cart:", err?.response?.data || err);
-      // Revert on error
       try {
         const { data } = await axios.get(CART_ENDPOINT, {
           headers: { Authorization: `Bearer ${user.token}` },
@@ -194,9 +180,7 @@ export default function CartPage() {
           (item: CartItem) => item.product !== null
         );
         setCart(validItems);
-      } catch (_) {
-        // If refetch fails, just keep current state
-      }
+      } catch (_) {}
     } finally {
       setUpdatingId(null);
     }
@@ -220,14 +204,12 @@ export default function CartPage() {
     setCart(next);
 
     try {
-      // Update quantity using the product ID (not cart item ID)
       await axios.put(
         `${CART_ENDPOINT}/${item.product._id}`,
         { quantity: qty },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
     } catch (err: any) {
-      // console.error("Update qty failed:", err?.response?.data || err);
       setCart(prev);
     } finally {
       setUpdatingId(null);
@@ -331,7 +313,22 @@ export default function CartPage() {
             </p>
           </div>
         </section>
-        <section className="max-w-6xl mx-auto mt-10 px-6 lg:px-12 font-serif pb-20">
+
+        {/* Currency Selector */}
+        <section className="max-w-6xl mx-auto px-6 lg:px-12 mt-6">
+          <div className="flex justify-end">
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as Currency)}
+              className="border rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[#742402]/30 bg-white"
+            >
+              <option value="USD">USD ($)</option>
+              <option value="INR">INR (₹)</option>
+            </select>
+          </div>
+        </section>
+
+        <section className="max-w-6xl mx-auto mt-6 px-6 lg:px-12 font-serif pb-20">
           {cart.length === 0 ? (
             <div className="mx-auto max-w-md bg-[#f2f2f2] p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200 text-center">
               <p className="text-gray-700">Your cart is empty.</p>
@@ -346,13 +343,12 @@ export default function CartPage() {
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="lg:col-span-2 space-y-4">
                 {cart.map((item) => {
-                  if (!item.product) return null; // Safety check
+                  if (!item.product) return null;
 
                   const actionId = getActionId(item);
                   const img = item.product.image?.[0];
                   const qty = item.quantity || 0;
                   const unit = getItemPrice(item);
-                  // console.log(unit)
                   const line = unit * qty;
                   const availableStock = getAvailableStock(item);
                   const selectedSize = getSelectedSize(item);
@@ -391,7 +387,7 @@ export default function CartPage() {
 
                           {/* Product Details */}
                           <div className="mt-2 space-y-2">
-                            {/* Size and Color - Prominent Display */}
+                            {/* Size and Color */}
                             {(item.size || item.color) && (
                               <div className="flex flex-wrap gap-2">
                                 {item.size && (
@@ -440,7 +436,7 @@ export default function CartPage() {
                             <div className="text-sm text-gray-700">
                               Unit Price:{" "}
                               <span className="font-bold text-lg text-gray-900">
-                                {INR.format(Math.round(unit))}
+                                {formatCurrency(unit)}
                               </span>
                               {item.size && selectedSize && (
                                 <span className="text-xs text-gray-500 ml-1">
@@ -491,7 +487,7 @@ export default function CartPage() {
                             Line total
                           </div>
                           <div className="text-base font-bold text-gray-900">
-                            {INR.format(Math.round(line))}
+                            {formatCurrency(line)}
                           </div>
                           <button
                             onClick={() => handleRemove(actionId)}
@@ -515,7 +511,7 @@ export default function CartPage() {
                   <div className="flex items-center justify-between">
                     <dt className="text-gray-700">Subtotal</dt>
                     <dd className="font-medium text-gray-900">
-                      {INR.format(Math.round(subtotal))}
+                      {formatCurrency(subtotal)}
                     </dd>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-600">
@@ -531,7 +527,7 @@ export default function CartPage() {
                     Total
                   </span>
                   <span className="text-xl font-bold text-gray-900">
-                    {INR.format(Math.round(subtotal))}
+                    {formatCurrency(subtotal)}
                   </span>
                 </div>
                 <div className="border-gray-300 flex items-center justify-between relative">
