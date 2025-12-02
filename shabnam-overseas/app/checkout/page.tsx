@@ -20,7 +20,7 @@ type CartItem = {
     image: string[];
     sizes: { label: string; price: number; stock: number }[];
     colors: { label: string }[];
-  };
+  } | null;
   size: string;
   color: string;
   quantity: number;
@@ -87,20 +87,26 @@ export default function CheckoutPage() {
       }
 
       const data = await res.json();
-      // console.log(data)
       const items: CartItem[] = Array.isArray(data) ? data : [];
-      setCartItems(items);
-      // console.log(cartItems)
+      
+      // ✅ Filter out items with null/undefined products
+      const validItems = items.filter(item => item.product && item.product._id);
+      
+      if (validItems.length < items.length) {
+        toast.error("Some cart items are invalid and were removed");
+      }
+      
+      setCartItems(validItems);
+      
       // ✅ Calculate grand total using correct size price
-      const total = items.reduce((acc, item) => {
-        const selectedSize = item.price
-        const price = selectedSize
+      const total = validItems.reduce((acc, item) => {
+        const price = item.price || 0;
         return acc + price * item.quantity;
       }, 0);
 
       setItemsPrice(total);
     } catch (err) {
-      // console.error(err);
+      console.error(err);
       toast.error("Unable to load cart");
     } finally {
       setLoading(false);
@@ -143,21 +149,23 @@ export default function CheckoutPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId,
-            orderItems: cartItems.map((item) => {
-              const selectedSize = item.product.sizes.find(
-                (s) => s.label === item.size
-              );
-              const price = selectedSize ? selectedSize.price : 0;
-              return {
-                product: item.product._id,
-                name: item.product.name,
-                qty: item.quantity,
-                size: item.size,
-                color: item.color,
-                price,
-                image: item.product.image?.[0],
-              };
-            }),
+            orderItems: cartItems
+              .filter(item => item.product) // ✅ Extra safety check
+              .map((item) => {
+                const selectedSize = item.product!.sizes.find(
+                  (s) => s.label === item.size
+                );
+                const price = selectedSize ? selectedSize.price : item.price || 0;
+                return {
+                  product: item.product!._id,
+                  name: item.product!.name,
+                  qty: item.quantity,
+                  size: item.size,
+                  color: item.color,
+                  price,
+                  image: item.product!.image?.[0] || "",
+                };
+              }),
             shippingAddress: {
               address: formData.address,
               city: formData.city,
@@ -214,8 +222,8 @@ export default function CheckoutPage() {
           try {
             const u = storedUser ? JSON.parse(storedUser) : null;
             return {
-              name: u?.name,
-              email: u?.email,
+              name: u?.name || "",
+              email: u?.email || "",
               contact: formData.mobileNumber,
             };
           } catch {
@@ -227,7 +235,7 @@ export default function CheckoutPage() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      // console.error(err);
+      console.error(err);
       toast.error("Something went wrong");
     }
   };
@@ -258,8 +266,10 @@ export default function CheckoutPage() {
             ) : cartItems.length > 0 ? (
               <div className="mt-4 space-y-4">
                 {cartItems.map((item) => {
-                  const selectedSize = item.price
-                  const price = selectedSize;
+                  // ✅ Add null check for product
+                  if (!item.product) return null;
+                  
+                  const price = item.price || 0;
                   return (
                     <div
                       key={item._id}

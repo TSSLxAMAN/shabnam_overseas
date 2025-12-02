@@ -5,40 +5,56 @@ import {
   forgotPassword,
   resetPassword,
   verifyResetToken,
-  verifyEmail, // ✅ Add this import
+  verifyEmail,
+  resendVerificationEmail,
   getUserProfile,
   updateUserProfile,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
-  resendVerificationEmail,
 } from "../controllers/user.controller";
-import forgotPasswordLimiter from "../middleware/rateLimit";
+import {
+  registerLimiter,
+  loginLimiter,
+  forgotPasswordLimiter,
+  resendVerificationLimiter,
+  wishlistLimiter,
+  strictApiLimiter,
+} from "../middleware/rateLimit";
 import { protect } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
-// Auth
-router.post("/register", registerUser);
-router.post("/login", loginUser);
+// ===== AUTH ROUTES (with rate limiters) =====
+router.post("/register", registerLimiter, registerUser);
+router.post("/login", loginLimiter, loginUser);
 
-// Email verification
-router.get("/verify-email/:token", verifyEmail); 
-router.post("/resend-verification", resendVerificationEmail); // ✅ Add this route
+// ===== EMAIL VERIFICATION ROUTES =====
+router.get("/verify-email/:token", verifyEmail);
+router.post(
+  "/resend-verification",
+  resendVerificationLimiter,
+  resendVerificationEmail
+);
 
-// ✅ Add this route
-
-// Password reset
+// ===== PASSWORD RESET ROUTES =====
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.get("/reset-password/:token", verifyResetToken);
 router.post("/reset-password/:token", resetPassword);
 router.put("/reset-password/:token", resetPassword);
 
-// Profile
+// ===== PROFILE ROUTES (protected) =====
 router.get("/profile", protect, getUserProfile);
-router.put("/profile", protect, updateUserProfile);
+router.put("/profile", protect, strictApiLimiter, updateUserProfile);
+
+// ===== WISHLIST ROUTES (protected + rate limited) =====
 router.get("/wishlist", protect, getWishlist);
-router.post("/wishlist/:productId", protect, addToWishlist);
-router.delete("/wishlist/:productId", protect, removeFromWishlist);
+router.post("/wishlist/:productId", protect, wishlistLimiter, addToWishlist);
+router.delete(
+  "/wishlist/:productId",
+  protect,
+  wishlistLimiter,
+  removeFromWishlist
+);
 
 export default router;

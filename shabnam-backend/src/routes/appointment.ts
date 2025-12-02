@@ -1,9 +1,11 @@
 import express from "express";
 import sendEmail from "../utils/sendEmail";
+import { appointmentLimiter } from "../middleware/rateLimit"; // ✅ Import appointment limiter
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+// ✅ Apply appointment limiter to prevent spam bookings
+router.post("/", appointmentLimiter, async (req, res) => {
   try {
     const { name, email, city, country, mobile, timezone, date, time } =
       req.body;

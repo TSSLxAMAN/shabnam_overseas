@@ -1,24 +1,3 @@
-// import express from "express";
-// import { protect } from "../middleware/authMiddleware";
-// import {
-//   addToCart,
-//   clearCart,
-//   getCart,
-//   removeFromCart,
-// } from "../controllers/cart.controller";
-
-// const router = express.Router();
-
-// router.post("/", protect, addToCart); 
-// router.get("/", protect, getCart);
-// router.delete("/", protect, clearCart);
-// router.delete("/:productId", protect, removeFromCart);
-
-// export default router;
-
-
-
-
 import express from "express";
 import { protect } from "../middleware/authMiddleware";
 import {

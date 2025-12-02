@@ -20,4 +20,3 @@ app.use("/api/admin/categories", categoryRoutes);
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
