@@ -47,7 +47,7 @@ export default function OrdersPage() {
         const { token } = JSON.parse(storedUser);
 
         const { data } = await axios.get(
-          "https://www.shabnamoverseas.com/api/users/profile",
+          "https://api.shabnamoverseas.com/api/users/profile",
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -88,7 +88,8 @@ export default function OrdersPage() {
   const getProductHref = (item: OrderItem) => {
     if (item.productUrl) return item.productUrl;
     if (item.slug) return `/products/${encodeURIComponent(item.slug)}`;
-    if (item.productId) return `/products/${encodeURIComponent(item.productId)}`;
+    if (item.productId)
+      return `/products/${encodeURIComponent(item.productId)}`;
     // Fallback: send to shop with a search query
     return `/shop?search=${encodeURIComponent(item.name || "")}`;
   };
@@ -161,7 +162,9 @@ export default function OrdersPage() {
                   {/* Order meta */}
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="text-sm text-gray-700">
-                      <span className="font-medium text-gray-900">Order ID:</span>{" "}
+                      <span className="font-medium text-gray-900">
+                        Order ID:
+                      </span>{" "}
                       <span className="font-mono">{order._id}</span>
                       <span className="mx-2 text-gray-300">•</span>
                       Placed on{" "}
@@ -267,28 +270,35 @@ export default function OrdersPage() {
                             </div>
 
                             {/* Optional specs table */}
-                            {item.specs && Object.keys(item.specs).length > 0 && (
-                              <div className="mt-3 overflow-hidden rounded-lg border border-gray-200">
-                                <dl className="divide-y divide-gray-100">
-                                  {Object.entries(item.specs).map(([k, v]) => (
-                                    <div
-                                      key={k}
-                                      className="flex items-center justify-between px-3 py-2"
-                                    >
-                                      <dt className="text-xs text-gray-600">{k}</dt>
-                                      <dd className="text-xs font-medium text-gray-900">
-                                        {String(v)}
-                                      </dd>
-                                    </div>
-                                  ))}
-                                </dl>
-                              </div>
-                            )}
+                            {item.specs &&
+                              Object.keys(item.specs).length > 0 && (
+                                <div className="mt-3 overflow-hidden rounded-lg border border-gray-200">
+                                  <dl className="divide-y divide-gray-100">
+                                    {Object.entries(item.specs).map(
+                                      ([k, v]) => (
+                                        <div
+                                          key={k}
+                                          className="flex items-center justify-between px-3 py-2"
+                                        >
+                                          <dt className="text-xs text-gray-600">
+                                            {k}
+                                          </dt>
+                                          <dd className="text-xs font-medium text-gray-900">
+                                            {String(v)}
+                                          </dd>
+                                        </div>
+                                      )
+                                    )}
+                                  </dl>
+                                </div>
+                              )}
                           </div>
 
                           {/* Price column */}
                           <div className="sm:text-right">
-                            <div className="text-xs text-gray-600">Line total</div>
+                            <div className="text-xs text-gray-600">
+                              Line total
+                            </div>
                             <div className="text-base font-bold text-gray-900">
                               {formatINR(lineTotal)}
                             </div>
@@ -301,7 +311,9 @@ export default function OrdersPage() {
                   {/* Order total bar */}
                   <div className="mt-2 flex items-center justify-between rounded-xl bg-white border border-gray-200 px-4 py-3">
                     <div className="text-sm text-gray-700">
-                      {order.isDelivered ? "Delivered" : "Estimated delivery soon"}
+                      {order.isDelivered
+                        ? "Delivered"
+                        : "Estimated delivery soon"}
                     </div>
                     <div className="text-lg font-bold text-gray-900">
                       Total: {formatINR(calculateTotal(order))}

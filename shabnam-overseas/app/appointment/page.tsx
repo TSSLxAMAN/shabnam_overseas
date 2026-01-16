@@ -31,11 +31,14 @@ export default function AppointmentPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://www.shabnamoverseas.com/api/appointment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        "https://api.shabnamoverseas.com/api/appointment",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (res.ok) {
         toast.success("Appointment booked successfully!");
@@ -162,7 +165,9 @@ export default function AppointmentPage() {
               />
               <div className="flex items-center text-sm gap-2">
                 <FaVideo className="text-[#742402]" />
-                <i>Web conferencing details will be provided upon confirmation</i>
+                <i>
+                  Web conferencing details will be provided upon confirmation
+                </i>
               </div>
             </div>
 

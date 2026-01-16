@@ -112,7 +112,7 @@ const ProductCard = ({
       (async () => {
         try {
           const res = await axios.get(
-            "https://www.shabnamoverseas.com/api/discounts"
+            "https://api.shabnamoverseas.com/api/discounts"
           );
           const discountValue = res.data?.data?.[0]?.value || 0;
           setDiscount(discountValue);
@@ -128,7 +128,7 @@ const ProductCard = ({
       if (!user) return;
       try {
         const { data } = await axios.get(
-          "https://www.shabnamoverseas.com/api/users/wishlist",
+          "https://api.shabnamoverseas.com/api/users/wishlist",
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
         const wishlistIds = data.map((item: any) => item._id || item);
@@ -153,7 +153,7 @@ const ProductCard = ({
     if (wishlistedIds.has(productId)) {
       try {
         const { data } = await axios.delete(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
         setWishlistedIds((prev) => {
@@ -170,7 +170,7 @@ const ProductCard = ({
     } else {
       try {
         const { data } = await axios.post(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           {},
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
@@ -339,7 +339,7 @@ export default function ProductDetailPage() {
       (async () => {
         try {
           const res = await axios.get(
-            "https://www.shabnamoverseas.com/api/discounts"
+            "https://api.shabnamoverseas.com/api/discounts"
           );
           const discountValue = res.data?.data?.[0]?.value || 0;
           setDiscount(discountValue);
@@ -356,7 +356,7 @@ export default function ProductDetailPage() {
       setLoading(true);
       try {
         const res = await axios.get(
-          `https://www.shabnamoverseas.com/api/products/${id}`
+          `https://api.shabnamoverseas.com/api/products/${id}`
         );
         const data = res.data as Product;
 
@@ -382,7 +382,7 @@ export default function ProductDetailPage() {
       setRelatedLoading(true);
       try {
         const res = await axios.get(
-          "https://www.shabnamoverseas.com/api/products"
+          "https://api.shabnamoverseas.com/api/products"
         );
         const allProducts = res.data.products as Product[];
 
@@ -406,7 +406,7 @@ export default function ProductDetailPage() {
       if (!user) return;
       try {
         const { data } = await axios.get(
-          "https://www.shabnamoverseas.com/api/users/wishlist",
+          "https://api.shabnamoverseas.com/api/users/wishlist",
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
         const wishlistIds = data.map((item: any) => item._id || item);
@@ -426,7 +426,7 @@ export default function ProductDetailPage() {
     if (wishlistedIds.has(productId)) {
       try {
         const { data } = await axios.delete(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
         setWishlistedIds((prev) => {
@@ -443,7 +443,7 @@ export default function ProductDetailPage() {
     } else {
       try {
         const { data } = await axios.post(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           {},
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
@@ -468,7 +468,7 @@ export default function ProductDetailPage() {
     }
 
     try {
-      const res = await fetch("https://www.shabnamoverseas.com/api/cart", {
+      const res = await fetch("https://api.shabnamoverseas.com/api/cart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

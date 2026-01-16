@@ -43,7 +43,8 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
   const pluckProductsArray = (data: any): Product[] => {
     if (Array.isArray(data)) return data as Product[];
     if (Array.isArray(data?.products)) return data.products as Product[];
-    if (Array.isArray(data?.data?.products)) return data.data.products as Product[];
+    if (Array.isArray(data?.data?.products))
+      return data.data.products as Product[];
     return [];
   };
 
@@ -59,7 +60,7 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
   const ensureAllProducts = async (): Promise<Product[]> => {
     if (Array.isArray(allProducts)) return allProducts;
     try {
-      const res = await fetch("https://www.shabnamoverseas.com/api/products");
+      const res = await fetch("https://api.shabnamoverseas.com/api/products");
       const json = await safeJson(res);
       const arr = pluckProductsArray(json);
       setAllProducts(arr);
@@ -75,7 +76,13 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
   const clientStrictContains = (items: unknown, q: string): Product[] => {
     if (!Array.isArray(items) || !q) return [];
     const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
-    const idxFields: (keyof Product)[] = ["name", "category", "style", "byColor", "size"];
+    const idxFields: (keyof Product)[] = [
+      "name",
+      "category",
+      "style",
+      "byColor",
+      "size",
+    ];
 
     const recordText = (p: Product) => {
       const parts: string[] = [];
@@ -104,7 +111,9 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
     try {
       // Try server-side search
       const res = await fetch(
-        `https://www.shabnamoverseas.com/api/products/search?query=${encodeURIComponent(q)}`
+        `https://api.shabnamoverseas.com/api/products/search?query=${encodeURIComponent(
+          q
+        )}`
       );
       const json = await safeJson(res);
       let arr = pluckProductsArray(json);
@@ -133,7 +142,9 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
   };
 
   const normalizeImage = (img?: string[] | string) =>
-    Array.isArray(img) ? (img[0] || "/placeholder.png") : (img || "/placeholder.png");
+    Array.isArray(img)
+      ? img[0] || "/placeholder.png"
+      : img || "/placeholder.png";
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (!results.length) return;
@@ -155,7 +166,10 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
           <input
             ref={inputRef}
             value={query}
-            onChange={(e) => { setQuery(e.target.value); setTouched(true); }}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setTouched(true);
+            }}
             onKeyDown={onKeyDown}
             placeholder="Search rugs by name, color, size, style, or category…"
             className="w-full h-12 rounded-2xl border border-neutral-300 px-4 pr-12 outline-none focus:ring-4 focus:ring-neutral-200"
@@ -164,7 +178,12 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
             <button
               aria-label="Clear"
               className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-xl hover:bg-neutral-100"
-              onClick={() => { setQuery(""); setResults([]); setFocusedIndex(-1); inputRef.current?.focus(); }}
+              onClick={() => {
+                setQuery("");
+                setResults([]);
+                setFocusedIndex(-1);
+                inputRef.current?.focus();
+              }}
             >
               <X className="size-4" />
             </button>
@@ -189,7 +208,10 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
             <span className="font-medium">“{query}”</span>
           </div>
         ) : results.length > 0 ? (
-          <ul role="listbox" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <ul
+            role="listbox"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+          >
             {results.map((item, idx) => (
               <li
                 key={item._id}
@@ -202,7 +224,9 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
                   focusedIndex === idx ? "ring-2 ring-neutral-300" : ""
                 }`}
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter") goToProduct(item._id); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") goToProduct(item._id);
+                }}
               >
                 <div className="flex gap-3">
                   <div className="relative w-20 h-20 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
@@ -216,7 +240,9 @@ export default function GlobalSearch({ onClose }: { onClose?: () => void }) {
                   <div className="flex-1">
                     <div className="font-medium line-clamp-1">{item.name}</div>
                     <div className="text-xs text-neutral-500 mt-0.5 line-clamp-1">
-                      {[item.category, item.style, item.byColor, item.size].filter(Boolean).join(" • ")}
+                      {[item.category, item.style, item.byColor, item.size]
+                        .filter(Boolean)
+                        .join(" • ")}
                     </div>
                     {typeof item.price === "number" && (
                       <div className="text-sm mt-1">₹{item.price}</div>

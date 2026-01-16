@@ -36,11 +36,14 @@ export default function TradePage() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://www.shabnamoverseas.com/api/trades/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        "https://api.shabnamoverseas.com/api/trades/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await res.json();
 

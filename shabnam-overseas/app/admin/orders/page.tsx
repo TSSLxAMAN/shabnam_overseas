@@ -31,7 +31,7 @@ export default function AdminOrdersPage() {
 
         const { token } = JSON.parse(storedAdmin);
         const { data } = await axios.get(
-          "https://www.shabnamoverseas.com/api/admin/orders",
+          "https://api.shabnamoverseas.com/api/admin/orders",
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -59,7 +59,7 @@ export default function AdminOrdersPage() {
       // console.log("Delivering order:", id); // 👀 log
 
       const { data } = await axios.put(
-        `https://www.shabnamoverseas.com/api/admin/orders/${id}/deliver`,
+        `https://api.shabnamoverseas.com/api/admin/orders/${id}/deliver`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -78,7 +78,6 @@ export default function AdminOrdersPage() {
       toast.error("Failed to mark as delivered");
     }
   };
-
 
   // Pagination (unchanged)
   const totalOrders = orders.length;

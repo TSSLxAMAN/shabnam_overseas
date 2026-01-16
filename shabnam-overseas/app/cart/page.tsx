@@ -11,7 +11,7 @@ import { Info } from "lucide-react";
 const CART_USES_ITEM_ID = false;
 const UPDATE_METHOD: "put" | "patch" | "post" = "put";
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "https://www.shabnamoverseas.com/api";
+  process.env.NEXT_PUBLIC_API_URL ?? "https://api.shabnamoverseas.com/api";
 const CART_ENDPOINT = `${API_BASE}/cart`;
 const buildItemUrl = (id: string) => `${CART_ENDPOINT}/${id}`;
 

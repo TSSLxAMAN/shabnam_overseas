@@ -21,7 +21,7 @@ export default function VerifyEmailPage() {
     const verifyEmail = async () => {
       try {
         const { data } = await axios.get(
-          `https://www.shabnamoverseas.com/api/users/verify-email/${token}`
+          `https://api.shabnamoverseas.com/api/users/verify-email/${token}`
         );
         setStatus("success");
         setMessage(data.message || "Email verified successfully!");

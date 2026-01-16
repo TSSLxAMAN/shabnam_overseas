@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import axios from "axios";
-import toast from 'react-hot-toast'
+import toast from "react-hot-toast";
 interface FormData {
   firstName: string;
   lastName: string;
@@ -81,7 +81,7 @@ export default function CustomPage() {
 
     try {
       const response = await axios.post(
-        "https://www.shabnamoverseas.com/api/custom-page-mail",
+        "https://api.shabnamoverseas.com/api/custom-page-mail",
         data,
         {
           headers: {

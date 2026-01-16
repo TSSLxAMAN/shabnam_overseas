@@ -8,7 +8,7 @@ type User = {
   email: string;
   name?: string;
   token: string;
-  role:string;
+  role: string;
 };
 
 type Admin = {
@@ -74,10 +74,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { data } = await axios.post("https://www.shabnamoverseas.com/api/users/login", {
-      email,
-      password,
-    });
+    const { data } = await axios.post(
+      "https://api.shabnamoverseas.com/api/users/login",
+      {
+        email,
+        password,
+      }
+    );
     localStorage.setItem("userInfo", JSON.stringify(data));
     axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
     setUser(data);
@@ -91,10 +94,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const adminLogin = async (email: string, password: string) => {
-    const { data } = await axios.post("https://www.shabnamoverseas.com/api/admin/login", {
-      email,
-      password,
-    });
+    const { data } = await axios.post(
+      "https://api.shabnamoverseas.com/api/admin/login",
+      {
+        email,
+        password,
+      }
+    );
     // console.log("admin logged in",data)
     localStorage.setItem("adminInfo", JSON.stringify(data));
     axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;

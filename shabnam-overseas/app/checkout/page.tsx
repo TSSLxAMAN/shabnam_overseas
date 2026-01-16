@@ -78,7 +78,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      const res = await fetch("https://www.shabnamoverseas.com/api/cart", {
+      const res = await fetch("https://api.shabnamoverseas.com/api/cart", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
 
     try {
       const orderRes = await fetch(
-        "https://www.shabnamoverseas.com/api/payment/create-order",
+        "https://api.shabnamoverseas.com/api/payment/create-order",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -201,7 +201,7 @@ export default function CheckoutPage() {
         order_id: orderData.razorpayOrder.id,
         handler: async function (response: any) {
           const verifyRes = await fetch(
-            "https://www.shabnamoverseas.com/api/payment/verify",
+            "https://api.shabnamoverseas.com/api/payment/verify",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -213,7 +213,7 @@ export default function CheckoutPage() {
           );
           const verifyData = await verifyRes.json();
           if (verifyData?.success) {
-            await fetch("https://www.shabnamoverseas.com/api/cart", {
+            await fetch("https://api.shabnamoverseas.com/api/cart", {
               method: "DELETE",
               headers: { Authorization: `Bearer ${token}` },
             });

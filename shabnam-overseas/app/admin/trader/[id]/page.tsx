@@ -55,7 +55,7 @@ export default function TraderDetailsPage() {
       const token = getToken();
       if (!token) return;
       const { data } = await axios.get<Trader[]>(
-        `https://www.shabnamoverseas.com/api/admin/traders/${id}`,
+        `https://api.shabnamoverseas.com/api/admin/traders/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // console.log(data);

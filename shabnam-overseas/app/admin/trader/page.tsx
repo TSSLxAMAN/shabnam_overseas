@@ -90,14 +90,17 @@ export default function TraderPage() {
         return;
       }
 
-      const response = await fetch("https://www.shabnamoverseas.com/api/discounts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, 
-        },
-        body: JSON.stringify({ discount: discount }),
-      });
+      const response = await fetch(
+        "https://api.shabnamoverseas.com/api/discounts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ discount: discount }),
+        }
+      );
 
       const result = await response.json();
 
@@ -107,7 +110,7 @@ export default function TraderPage() {
       } else {
         toast.error(result.message || "Failed to save discount");
       }
-      fetchDiscount()
+      fetchDiscount();
     } catch (error) {
       // console.error("Network error:", error);
       toast.error("Network error. Please try again.");
@@ -115,18 +118,21 @@ export default function TraderPage() {
       setIsLoading(false);
     }
   };
-  
+
   const fetchTraders = async () => {
     try {
       const token = getToken();
       if (!token) return;
 
-      const response = await fetch("https://www.shabnamoverseas.com/api/admin/traders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://api.shabnamoverseas.com/api/admin/traders",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch traders");
@@ -144,11 +150,14 @@ export default function TraderPage() {
 
   const fetchDiscount = async () => {
     try {
-      const response = await fetch("https://www.shabnamoverseas.com/api/discounts", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://api.shabnamoverseas.com/api/discounts",
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch discounts");
@@ -161,7 +170,6 @@ export default function TraderPage() {
         const latestDiscount = data.data[0];
         setDiscountPrize(latestDiscount.value.toString());
       }
-
     } catch (err) {
       // console.error(err);
       // console.error("Failed to fetch discounts");
@@ -208,7 +216,7 @@ export default function TraderPage() {
       markBusy(id, true);
 
       const response = await fetch(
-        `https://www.shabnamoverseas.com/api/admin/traders/${id}/verify`,
+        `https://api.shabnamoverseas.com/api/admin/traders/${id}/verify`,
         {
           method: "PUT",
           headers: {
@@ -251,7 +259,7 @@ export default function TraderPage() {
       markBusy(id, true);
 
       const response = await fetch(
-        `https://www.shabnamoverseas.com/api/admin/traders/${id}/unverify`,
+        `https://api.shabnamoverseas.com/api/admin/traders/${id}/unverify`,
         {
           method: "PUT",
           headers: {

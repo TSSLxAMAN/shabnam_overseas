@@ -18,7 +18,7 @@ export default function ResendVerificationPage() {
 
     try {
       const { data } = await axios.post(
-        "https://www.shabnamoverseas.com/api/users/resend-verification",
+        "https://api.shabnamoverseas.com/api/users/resend-verification",
         { email }
       );
 

@@ -6,7 +6,6 @@ import axios from "@/lib/userAxios";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 
-
 type OrderItem = {
   _id: string;
   name: string;
@@ -65,7 +64,7 @@ export default function AdminOrderDetailsPage() {
         const { token } = JSON.parse(storedAdmin);
 
         const { data } = await axios.get(
-          `https://www.shabnamoverseas.com/api/admin/orders/${id}`,
+          `https://api.shabnamoverseas.com/api/admin/orders/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

@@ -166,7 +166,7 @@ function StylePageContent() {
   const fetchFilteredProducts = async (filterValue: string) => {
     setLoading(true);
     try {
-      const url = `https://www.shabnamoverseas.com/api/filter/products?filter=${encodeURIComponent(
+      const url = `https://api.shabnamoverseas.com/api/filter/products?filter=${encodeURIComponent(
         filterValue
       )}`;
       const res = await axios.get(url);
@@ -181,7 +181,6 @@ function StylePageContent() {
       setPriceRange({ min: filters.minPrice, max: filters.maxPrice });
 
       // Reset price inputs to show full range
-     
     } catch (error: any) {
       toast.error("Failed to load products.");
       setProducts([]);
@@ -233,7 +232,7 @@ function StylePageContent() {
     if (!user?.token) return;
     try {
       const r1 = await axios.get(
-        "https://www.shabnamoverseas.com/api/users/wishlist",
+        "https://api.shabnamoverseas.com/api/users/wishlist",
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
@@ -245,7 +244,7 @@ function StylePageContent() {
       }
 
       const r2 = await axios.get(
-        "https://www.shabnamoverseas.com/api/users/me",
+        "https://api.shabnamoverseas.com/api/users/me",
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
@@ -257,7 +256,7 @@ function StylePageContent() {
       }
 
       const r3 = await axios.get(
-        "https://www.shabnamoverseas.com/api/users/profile",
+        "https://api.shabnamoverseas.com/api/users/profile",
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
@@ -307,7 +306,7 @@ function StylePageContent() {
     try {
       if (already) {
         await axios.delete(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
@@ -315,7 +314,7 @@ function StylePageContent() {
         toast.success("Removed from wishlist");
       } else {
         await axios.post(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           {},
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
@@ -368,7 +367,6 @@ function StylePageContent() {
               className="w-24 p-2 rounded border outline-none focus:ring-2 focus:ring-[#742402]/30"
             />
           </div>
-          
         </div>
       </details>
 

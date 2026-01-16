@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState, Suspense } from 'react';
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
-import toast from 'react-hot-toast';
-import axios from 'axios';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import toast from "react-hot-toast";
+import axios from "axios";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -21,7 +21,7 @@ function ResetPasswordContent() {
 
   const [loading, setLoading] = useState(false);
   const [validToken, setValidToken] = useState(false);
- const params = useParams();
+  const params = useParams();
 
   // derive simple strength & match state (purely UI)
   const strength = useMemo(() => {
@@ -60,7 +60,7 @@ function ResetPasswordContent() {
       if (!token) return;
       try {
         await axios.get(
-          `https://www.shabnamoverseas.com/api/users/reset-password/${token}`
+          `https://api.shabnamoverseas.com/api/users/reset-password/${token}`
         );
         setValidToken(true);
       } catch (err) {
@@ -89,7 +89,7 @@ function ResetPasswordContent() {
     try {
       setLoading(true);
       await axios.put(
-        `https://www.shabnamoverseas.com/api/users/reset-password/${token}`,
+        `https://api.shabnamoverseas.com/api/users/reset-password/${token}`,
         {
           password,
         }

@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://www.shabnamoverseas.com/api/admin", // ✅ FIXED!
+  baseURL: "https://api.shabnamoverseas.com/api/admin", // ✅ FIXED!
   headers: {
     "Content-Type": "application/json",
   },

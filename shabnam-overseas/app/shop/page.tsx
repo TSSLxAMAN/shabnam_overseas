@@ -66,7 +66,7 @@ export default function ShopPage() {
       if (selectedColors[0]) params.append("color", selectedColors[0]);
 
       const res = await fetch(
-        `https://www.shabnamoverseas.com/api/filter/products?${params.toString()}`
+        `https://api.shabnamoverseas.com/api/filter/products?${params.toString()}`
       );
       // If the server ever returns non-JSON (error page), protect against it:
       const text = await res.text();
@@ -168,7 +168,7 @@ export default function ShopPage() {
     if (wishlistedIds.has(productId)) {
       try {
         const { data } = await axios.delete(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );
         setWishlistedIds((prev) => {
@@ -186,7 +186,7 @@ export default function ShopPage() {
       // else -> add to wishlist
       try {
         const { data } = await axios.post(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           {},
           { headers: { Authorization: `Bearer ${user?.token}` } }
         );

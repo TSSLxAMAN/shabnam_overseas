@@ -27,7 +27,7 @@ export default function Footer() {
 
     try {
       const response = await axios.post(
-        "https://www.shabnamoverseas.com/api/vip-signup",
+        "https://api.shabnamoverseas.com/api/vip-signup",
         { email }
       );
 

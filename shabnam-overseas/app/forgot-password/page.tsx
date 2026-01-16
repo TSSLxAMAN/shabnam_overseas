@@ -18,7 +18,7 @@
 //     setError('');
 
 //     try {
-//       const res = await axios.post('https://www.shabnamoverseas.com/api/users/forgot-password', { email });
+//       const res = await axios.post('https://api.shabnamoverseas.com/api/users/forgot-password', { email });
 
 //       setMessage(res.data.message || 'Reset link sent to your email.');
 //     } catch (err: any) {
@@ -72,17 +72,6 @@
 //   );
 // }
 
-
-
-
-
-
-
-
-
-
-
-
 // app/forgot-password/page.tsx
 "use client";
 
@@ -112,7 +101,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const res = await axios.post(
-        "https://www.shabnamoverseas.com/api/users/forgot-password",
+        "https://api.shabnamoverseas.com/api/users/forgot-password",
         { email }
       );
       setMessage(res.data?.message || "Reset link sent to your email.");

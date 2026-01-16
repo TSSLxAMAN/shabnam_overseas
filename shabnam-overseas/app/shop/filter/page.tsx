@@ -166,10 +166,10 @@ function FilterContent() {
     setLoading(true);
     try {
       const url = filterValue
-        ? `https://www.shabnamoverseas.com/api/filter/products?filter=${encodeURIComponent(
+        ? `https://api.shabnamoverseas.com/api/filter/products?filter=${encodeURIComponent(
             filterValue
           )}`
-        : `https://www.shabnamoverseas.com/api/filter/products`;
+        : `https://api.shabnamoverseas.com/api/filter/products`;
       const res = await axios.get(url);
       const data = res.data?.products ?? [];
       setProducts(data);
@@ -186,7 +186,7 @@ function FilterContent() {
     if (!user?.token) return;
     try {
       const r1 = await axios.get(
-        "https://www.shabnamoverseas.com/api/users/wishlist",
+        "https://api.shabnamoverseas.com/api/users/wishlist",
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
@@ -198,7 +198,7 @@ function FilterContent() {
       }
 
       const r2 = await axios.get(
-        "https://www.shabnamoverseas.com/api/users/me",
+        "https://api.shabnamoverseas.com/api/users/me",
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
@@ -232,7 +232,7 @@ function FilterContent() {
     try {
       if (already) {
         await axios.delete(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
@@ -240,7 +240,7 @@ function FilterContent() {
         toast.success("Removed from wishlist");
       } else {
         await axios.post(
-          `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+          `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
           {},
           { headers: { Authorization: `Bearer ${user.token}` } }
         );

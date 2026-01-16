@@ -103,7 +103,7 @@ export default function WishlistPage() {
       }
       try {
         const { data } = await axios.get(
-          "https://www.shabnamoverseas.com/api/users/wishlist",
+          "https://api.shabnamoverseas.com/api/users/wishlist",
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
@@ -129,7 +129,7 @@ export default function WishlistPage() {
   const handleRemoveFromWishlist = async (productId: string) => {
     try {
       const { data } = await axios.delete(
-        `https://www.shabnamoverseas.com/api/users/wishlist/${productId}`,
+        `https://api.shabnamoverseas.com/api/users/wishlist/${productId}`,
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       setWishlist((prev) => {

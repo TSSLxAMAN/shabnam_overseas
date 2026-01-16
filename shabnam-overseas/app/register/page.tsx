@@ -31,7 +31,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        "https://www.shabnamoverseas.com/api/users/register",
+        "https://api.shabnamoverseas.com/api/users/register",
         form
       );
 

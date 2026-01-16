@@ -38,7 +38,7 @@ interface Order {
 const PRODUCT_PAGE_BASE = "/product";
 
 const productDetailEndpoint = (id: string) =>
-  `https://www.shabnamoverseas.com/api/products/${encodeURIComponent(id)}`;
+  `https://api.shabnamoverseas.com/api/products/${encodeURIComponent(id)}`;
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -67,7 +67,7 @@ export default function ProfilePage() {
         }
 
         const { data } = await axios.get(
-          `https://www.shabnamoverseas.com/api/users/profile`,
+          `https://api.shabnamoverseas.com/api/users/profile`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -148,7 +148,7 @@ export default function ProfilePage() {
       if (!token) return;
 
       await axios.put(
-        `https://www.shabnamoverseas.com/api/users/profile`,
+        `https://api.shabnamoverseas.com/api/users/profile`,
         editForm,
         {
           headers: { Authorization: `Bearer ${token}` },
